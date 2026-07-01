@@ -115,18 +115,18 @@
         <el-form ref="globalForm" :model="globalForm" :rules="globalRules" label-width="160px" style="max-width: 700px;">
           <h4 class="form-section">AI 云创配置</h4>
           <el-form-item label="单次选择视频上限" prop="maxVideos">
-            <el-input-number v-model="globalForm.maxVideos" :min="1" :max="50" :step="1" step-strictly />
-            <span style="margin-left: 10px; color: #909399;">个</span>
+            <el-input-number v-model="globalForm.maxVideos" :disabled="true" :min="1" :max="50" :step="1" step-strictly />
+            <span style="margin-left: 10px; color: #909399;">个（固定 10，不可修改）</span>
           </el-form-item>
           <el-form-item label="切片时长区间" prop="sliceMin">
-            <el-input-number v-model="globalForm.sliceMin" :min="0.1" :max="10" :step="0.1" :precision="1" />
+            <el-input-number v-model="globalForm.sliceMin" :disabled="true" :min="0.1" :max="10" :step="0.1" :precision="1" />
             <span style="margin: 0 10px;">~</span>
-            <el-input-number v-model="globalForm.sliceMax" :min="0.1" :max="60" :step="0.1" :precision="1" />
-            <span style="margin-left: 10px; color: #909399;">秒</span>
+            <el-input-number v-model="globalForm.sliceMax" :disabled="true" :min="0.1" :max="60" :step="0.1" :precision="1" />
+            <span style="margin-left: 10px; color: #909399;">秒（固定 0.5~10s，不可修改）</span>
           </el-form-item>
           <el-form-item label="切片时长步长" prop="sliceStep">
-            <el-input-number v-model="globalForm.sliceStep" :min="0.1" :max="1" :step="0.1" :precision="1" />
-            <span style="margin-left: 10px; color: #909399;">秒</span>
+            <el-input-number v-model="globalForm.sliceStep" :disabled="true" :min="0.1" :max="1" :step="0.1" :precision="1" />
+            <span style="margin-left: 10px; color: #909399;">秒（固定 0.1s，不可修改）</span>
           </el-form-item>
 
           <h4 class="form-section">提示文案配置</h4>

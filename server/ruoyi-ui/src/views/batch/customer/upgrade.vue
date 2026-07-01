@@ -42,21 +42,30 @@ export default {
         totalIndividualCapacity: undefined,
         maxIndividual: undefined
       },
-      rules: {
-        parentPhone: [
+
+    }
+  },
+  computed: {
+    rules() {
+      const baseRules = {}
+      if (this.row.customerType === 3) {
+        baseRules.parentPhone = [
           { required: true, message: "新上级手机号不能为空", trigger: "blur" },
           { pattern: /^1[3-9]\d{9}$/, message: "请输入正确的手机号", trigger: "blur" }
-        ],
-        maxServiceProvider: [
-          { required: true, message: "最大服务商数量不能为空", trigger: "change" }
-        ],
-        totalIndividualCapacity: [
-          { required: true, message: "个人账号总容量不能为空", trigger: "change" }
-        ],
-        maxIndividual: [
+        ]
+        baseRules.maxIndividual = [
           { required: true, message: "个人账号上限不能为空", trigger: "change" }
         ]
       }
+      if (this.row.customerType === 2) {
+        baseRules.maxServiceProvider = [
+          { required: true, message: "最大服务商数量不能为空", trigger: "change" }
+        ]
+        baseRules.totalIndividualCapacity = [
+          { required: true, message: "个人账号总容量不能为空", trigger: "change" }
+        ]
+      }
+      return baseRules
     }
   },
   methods: {

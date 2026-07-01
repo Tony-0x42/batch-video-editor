@@ -5,21 +5,40 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 <mapper namespace="com.ruoyi.batch.computing.mapper.BatchComputingPowerLogMapper">
 
     <resultMap type="com.ruoyi.batch.computing.domain.BatchComputingPowerLog" id="BatchComputingPowerLogResult">
-        <id     property="id"          column="id"          />
-        <result property="createBy"    column="create_by"   />
-        <result property="createTime"  column="create_time" />
-        <result property="updateBy"    column="update_by"   />
-        <result property="updateTime"  column="update_time" />
-        <result property="remark"      column="remark"      />
+        <id     property="id"             column="id"             />
+        <result property="phone"          column="phone"          />
+        <result property="operationType"  column="operation_type" />
+        <result property="consumeValue"   column="consume_value"  />
+        <result property="remainValue"    column="remain_value"   />
+        <result property="videoGroupName" column="video_group_name"/>
+        <result property="createTime"     column="create_time"    />
     </resultMap>
 
     <sql id="selectBatchComputingPowerLogVo">
-        select id, create_by, create_time, update_by, update_time, remark
+        select id, phone, operation_type, consume_value, remain_value, video_group_name, create_time
         from batch_computing_power_log
     </sql>
 
     <select id="selectList" parameterType="com.ruoyi.batch.computing.domain.BatchComputingPowerLog" resultMap="BatchComputingPowerLogResult">
         <include refid="selectBatchComputingPowerLogVo"/>
+        <where>
+            <if test="phone != null and phone != ''">
+                and phone = #{phone}
+            </if>
+            <if test="operationType != null">
+                and operation_type = #{operationType}
+            </if>
+            <if test="videoGroupName != null and videoGroupName != ''">
+                and video_group_name like concat('%', #{videoGroupName}, '%')
+            </if>
+            <if test="params != null and params.beginTime != null and params.beginTime != ''">
+                and date_format(create_time, '%Y%m%d') &gt;= date_format(#{params.beginTime}, '%Y%m%d')
+            </if>
+            <if test="params != null and params.endTime != null and params.endTime != ''">
+                and date_format(create_time, '%Y%m%d') &lt;= date_format(#{params.endTime}, '%Y%m%d')
+            </if>
+        </where>
+        order by create_time desc
     </select>
 
 </mapper>

@@ -83,11 +83,36 @@
         </el-tab-pane>
 
         <el-tab-pane label="算力消耗记录" name="computing">
-          <el-empty description="暂无算力消耗记录" />
+          <el-table v-loading="loadingComputing" :data="computingList">
+            <el-table-column label="操作类型" align="center" prop="operationType" width="100">
+              <template slot-scope="scope">{{ formatOperationType(scope.row.operationType) }}</template>
+            </el-table-column>
+            <el-table-column label="消耗算力(GF)" align="center" prop="consumeValue" />
+            <el-table-column label="剩余算力(GF)" align="center" prop="remainValue" />
+            <el-table-column label="关联视频组" align="center" prop="videoGroupName" :show-overflow-tooltip="true" />
+            <el-table-column label="操作时间" align="center" prop="createTime" width="160">
+              <template slot-scope="scope">
+                <span>{{ parseTime(scope.row.createTime) }}</span>
+              </template>
+            </el-table-column>
+          </el-table>
+          <pagination v-show="computingTotal > 0" :total="computingTotal" :page.sync="computingQuery.pageNum" :limit.sync="computingQuery.pageSize" @pagination="getComputingList" />
         </el-tab-pane>
 
         <el-tab-pane label="视频生成记录" name="video">
-          <el-empty description="暂无视频生成记录" />
+          <el-table v-loading="loadingVideo" :data="videoList">
+            <el-table-column label="视频组名称" align="center" prop="videoGroupName" :show-overflow-tooltip="true" />
+            <el-table-column label="生成数量" align="center" prop="generateCount" width="100" />
+            <el-table-column label="状态" align="center" prop="status" width="100">
+              <template slot-scope="scope">{{ formatVideoStatus(scope.row.status) }}</template>
+            </el-table-column>
+            <el-table-column label="生成时间" align="center" prop="createTime" width="160">
+              <template slot-scope="scope">
+                <span>{{ parseTime(scope.row.createTime) }}</span>
+              </template>
+            </el-table-column>
+          </el-table>
+          <pagination v-show="videoTotal > 0" :total="videoTotal" :page.sync="videoQuery.pageNum" :limit.sync="videoQuery.pageSize" @pagination="getVideoList" />
         </el-tab-pane>
 
         <el-tab-pane label="注册二维码" name="qrcode">
@@ -111,6 +136,7 @@
 <script>
 import { getCustomer, delCustomer, resetCustomerQrCode } from "@/api/batch/customer"
 import { listCustomer } from "@/api/batch/customer"
+import { listStatisticsComputing, listStatisticsVideo } from "@/api/batch/statistics"
 import CustomerMigrateDialog from "./migrate"
 import CustomerFormDialog from "./form"
 
@@ -130,7 +156,23 @@ export default {
         pageSize: 10,
         parentPhone: undefined
       },
-      individualCount: 0
+      individualCount: 0,
+      loadingComputing: false,
+      computingList: [],
+      computingTotal: 0,
+      computingQuery: {
+        pageNum: 1,
+        pageSize: 10,
+        phone: undefined
+      },
+      loadingVideo: false,
+      videoList: [],
+      videoTotal: 0,
+      videoQuery: {
+        pageNum: 1,
+        pageSize: 10,
+        phone: undefined
+      }
     }
   },
   created() {
@@ -139,7 +181,7 @@ export default {
   },
   computed: {
     subordinateCount() {
-      return this.subordinateList.length
+      return this.subordinateTotal
     }
   },
   methods: {
@@ -148,6 +190,8 @@ export default {
         this.customer = response.data || {}
         this.getSubordinateList()
         this.getIndividualCount()
+        this.getComputingList()
+        this.getVideoList()
       })
     },
     getSubordinateList() {
@@ -173,6 +217,26 @@ export default {
       }
       listCustomer(query).then(response => {
         this.individualCount = (response.rows || []).length
+      })
+    },
+    getComputingList() {
+      if (!this.customer.phone) return
+      this.loadingComputing = true
+      this.computingQuery.phone = this.customer.phone
+      listStatisticsComputing(this.computingQuery).then(response => {
+        this.computingList = response.rows || []
+        this.computingTotal = response.total || 0
+        this.loadingComputing = false
+      })
+    },
+    getVideoList() {
+      if (!this.customer.phone) return
+      this.loadingVideo = true
+      this.videoQuery.phone = this.customer.phone
+      listStatisticsVideo(this.videoQuery).then(response => {
+        this.videoList = response.rows || []
+        this.videoTotal = response.total || 0
+        this.loadingVideo = false
       })
     },
     goBack() {
@@ -209,6 +273,14 @@ export default {
     formatType(type) {
       const map = { 1: "分公司", 2: "服务商", 3: "个人" }
       return map[type] || type
+    },
+    formatOperationType(type) {
+      const map = { 1: "生成", 2: "下载" }
+      return map[type] || type
+    },
+    formatVideoStatus(status) {
+      const map = { 0: "成功", 1: "失败" }
+      return map[status] || status
     }
   }
 }

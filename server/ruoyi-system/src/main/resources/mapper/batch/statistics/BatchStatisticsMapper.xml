@@ -94,6 +94,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </if>
     </sql>
 
+    <!-- 日志类手机号精确过滤：客户详情页按账号筛选 -->
+    <sql id="logPhoneFilter">
+        <if test="phone != null and phone != ''">
+            AND l.phone = #{phone}
+        </if>
+    </sql>
+
     <!-- 今日概览指标 -->
     <select id="selectOverview" parameterType="com.ruoyi.batch.statistics.domain.BatchStatisticsQuery" resultMap="BatchStatisticsOverviewResult">
         SELECT
@@ -174,6 +181,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         LEFT JOIN batch_customer c ON l.phone = c.phone AND c.del_flag = 0
         WHERE 1 = 1
         <include refid="logBranchFilter"/>
+        <include refid="logPhoneFilter"/>
         <if test="startDate != null"> AND DATE(l.create_time) >= #{startDate} </if>
         <if test="endDate != null"> AND DATE(l.create_time) <= #{endDate} </if>
         ORDER BY l.create_time DESC
@@ -186,6 +194,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         LEFT JOIN batch_customer c ON l.phone = c.phone AND c.del_flag = 0
         WHERE 1 = 1
         <include refid="logBranchFilter"/>
+        <include refid="logPhoneFilter"/>
         <if test="startDate != null"> AND DATE(l.create_time) >= #{startDate} </if>
         <if test="endDate != null"> AND DATE(l.create_time) <= #{endDate} </if>
         ORDER BY l.create_time DESC

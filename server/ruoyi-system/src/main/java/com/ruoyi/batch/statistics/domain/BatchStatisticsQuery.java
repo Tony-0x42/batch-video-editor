@@ -27,6 +27,9 @@ public class BatchStatisticsQuery extends BaseEntity
     /** 所属分公司手机号（总后台筛选用，分公司后台由后端自动填充） */
     private String branchPhone;
 
+    /** 账号手机号（客户详情页按账号筛选） */
+    private String phone;
+
     /** 趋势天数 */
     private Integer days;
 
@@ -68,6 +71,16 @@ public class BatchStatisticsQuery extends BaseEntity
     public void setBranchPhone(String branchPhone)
     {
         this.branchPhone = branchPhone;
+    }
+
+    public String getPhone()
+    {
+        return phone;
+    }
+
+    public void setPhone(String phone)
+    {
+        this.phone = phone;
     }
 
     public Integer getDays()

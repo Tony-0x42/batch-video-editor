@@ -28,6 +28,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="updateBy"                column="update_by"                />
         <result property="updateTime"              column="update_time"              />
         <result property="remark"                  column="remark"                   />
+        <result property="subordinateCount"        column="subordinate_count"      />
     </resultMap>
 
     <sql id="selectBatchCustomerVo">
@@ -35,7 +36,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                c.parent_phone, c.branch_phone, c.max_service_provider, c.total_individual_capacity,
                c.max_individual, c.computing_power_total, c.computing_power_used,
                c.computing_power_remain, c.vip_expire_date, c.qr_code_url, c.qr_code_key,
-               c.status, c.del_flag, c.create_by, c.create_time, c.update_by, c.update_time, c.remark
+               c.status, c.del_flag, c.create_by, c.create_time, c.update_by, c.update_time, c.remark,
+               (select count(*) from batch_customer sub where sub.parent_phone = c.phone and sub.del_flag = 0) as subordinate_count
         from batch_customer c
     </sql>
 
