@@ -61,15 +61,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="customerName" column="customer_name" />
         <result property="customerType" column="customer_type" />
         <result property="scanCount"    column="scan_count"    />
-        <result property="downloadCount"column="download_count"/>
-        <result property="registerCount"column="register_count"/>
+        <result property="downloadCount" column="download_count"/>
+        <result property="registerCount" column="register_count"/>
         <result property="statDate"     column="stat_date"     />
     </resultMap>
 
     <resultMap type="com.ruoyi.batch.statistics.domain.BatchNewsStat" id="BatchNewsStatResult">
         <id     property="newsId"      column="news_id"      />
         <result property="newsTitle"   column="news_title"   />
-        <result property="championName"column="champion_name"/>
+        <result property="championName" column="champion_name"/>
         <result property="salesAmount" column="sales_amount" />
         <result property="status"      column="status"       />
         <result property="updateTime"  column="update_time"  />
@@ -170,7 +170,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <if test="customerType != null"> AND c.customer_type = #{customerType} </if>
         <include refid="accountBranchFilter"/>
         <if test="startDate != null"> AND DATE(c.create_time) >= #{startDate} </if>
-        <if test="endDate != null"> AND DATE(c.create_time) <= #{endDate} </if>
+        <if test="endDate != null"> AND DATE(c.create_time) &lt;= #{endDate} </if>
         ORDER BY c.create_time DESC
     </select>
 
@@ -183,7 +183,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="logBranchFilter"/>
         <include refid="logPhoneFilter"/>
         <if test="startDate != null"> AND DATE(l.create_time) >= #{startDate} </if>
-        <if test="endDate != null"> AND DATE(l.create_time) <= #{endDate} </if>
+        <if test="endDate != null"> AND DATE(l.create_time) &lt;= #{endDate} </if>
         ORDER BY l.create_time DESC
     </select>
 
@@ -196,7 +196,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="logBranchFilter"/>
         <include refid="logPhoneFilter"/>
         <if test="startDate != null"> AND DATE(l.create_time) >= #{startDate} </if>
-        <if test="endDate != null"> AND DATE(l.create_time) <= #{endDate} </if>
+        <if test="endDate != null"> AND DATE(l.create_time) &lt;= #{endDate} </if>
         ORDER BY l.create_time DESC
     </select>
 
@@ -208,7 +208,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         WHERE 1 = 1
         <include refid="logBranchFilter"/>
         <if test="startDate != null"> AND s.stat_date >= #{startDate} </if>
-        <if test="endDate != null"> AND s.stat_date <= #{endDate} </if>
+        <if test="endDate != null"> AND s.stat_date &lt;= #{endDate} </if>
         ORDER BY s.stat_date DESC, s.stat_id DESC
     </select>
 
@@ -218,7 +218,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         FROM batch_home_news n
         WHERE n.del_flag = 0
         <if test="startDate != null"> AND DATE(n.update_time) >= #{startDate} </if>
-        <if test="endDate != null"> AND DATE(n.update_time) <= #{endDate} </if>
+        <if test="endDate != null"> AND DATE(n.update_time) &lt;= #{endDate} </if>
         ORDER BY n.update_time DESC
     </select>
 
@@ -229,7 +229,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         WHERE del_flag = 0
         <if test="branchPhone != null and branchPhone != ''"> AND (branch_phone = #{branchPhone} OR phone = #{branchPhone}) </if>
         <if test="startDate != null"> AND DATE(create_time) >= #{startDate} </if>
-        <if test="endDate != null"> AND DATE(create_time) <= #{endDate} </if>
+        <if test="endDate != null"> AND DATE(create_time) &lt;= #{endDate} </if>
         GROUP BY DATE(create_time)
         ORDER BY stat_date ASC
     </select>
@@ -242,7 +242,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         WHERE 1 = 1
         <include refid="logBranchFilter"/>
         <if test="startDate != null"> AND DATE(l.create_time) >= #{startDate} </if>
-        <if test="endDate != null"> AND DATE(l.create_time) <= #{endDate} </if>
+        <if test="endDate != null"> AND DATE(l.create_time) &lt;= #{endDate} </if>
         GROUP BY DATE(l.create_time)
         ORDER BY stat_date ASC
     </select>
@@ -255,7 +255,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         WHERE l.status = 0
         <include refid="logBranchFilter"/>
         <if test="startDate != null"> AND DATE(l.create_time) >= #{startDate} </if>
-        <if test="endDate != null"> AND DATE(l.create_time) <= #{endDate} </if>
+        <if test="endDate != null"> AND DATE(l.create_time) &lt;= #{endDate} </if>
         GROUP BY DATE(l.create_time)
         ORDER BY stat_date ASC
     </select>
@@ -268,7 +268,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         WHERE 1 = 1
         <include refid="logBranchFilter"/>
         <if test="startDate != null"> AND s.stat_date >= #{startDate} </if>
-        <if test="endDate != null"> AND s.stat_date <= #{endDate} </if>
+        <if test="endDate != null"> AND s.stat_date &lt;= #{endDate} </if>
         GROUP BY s.stat_date
         ORDER BY s.stat_date ASC
     </select>
