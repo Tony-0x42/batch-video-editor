@@ -316,7 +316,7 @@ export default {
     },
     /** 查看详情 */
     handleDetail(row) {
-      this.$router.push({ path: "/batch/customer/detail", query: { customerId: row.customerId }})
+      this.$router.push("/batch/customer/detail/" + row.customerId)
     },
     /** 提交单个编辑 */
     submitForm() {

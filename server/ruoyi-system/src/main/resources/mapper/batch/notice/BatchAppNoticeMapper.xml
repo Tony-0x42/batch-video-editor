@@ -44,10 +44,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 AND publish_status = #{publishStatus}
             </if>
             <if test="params.beginTime != null and params.beginTime != ''">
-                AND date_format(publish_time, '%y%m%d') &gt;= date_format(#{params.beginTime}, '%y%m%d')
+                AND date_format(publish_time, '%Y%m%d') &gt;= date_format(#{params.beginTime}, '%Y%m%d')
             </if>
             <if test="params.endTime != null and params.endTime != ''">
-                AND date_format(publish_time, '%y%m%d') &lt;= date_format(#{params.endTime}, '%y%m%d')
+                AND date_format(publish_time, '%Y%m%d') &lt;= date_format(#{params.endTime}, '%Y%m%d')
             </if>
             AND del_flag = 0
         </where>

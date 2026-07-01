@@ -570,7 +570,7 @@ export default {
       }
       this.$modal.confirm('是否确认导出当前筛选条件下的数据？').then(() => {
         exportFunc(this.queryParams).then(response => {
-          this.downloadFile(response, fileName)
+          this.downloadFile(response.data, fileName)
           this.$modal.msgSuccess('导出成功')
         }).catch(() => {
           this.$modal.msgError('导出失败，请稍后重试')

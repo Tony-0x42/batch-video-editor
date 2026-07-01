@@ -1,6 +1,7 @@
 package com.ruoyi.batch.notice.controller;
 
 import java.util.List;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -50,11 +51,11 @@ public class BatchAppNoticeController extends BaseController
     @PreAuthorize("@ss.hasPermi('batch:notice:export')")
     @Log(title = "APP公告", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
-    public AjaxResult export(BatchAppNotice batchAppNotice)
+    public void export(HttpServletResponse response, BatchAppNotice batchAppNotice)
     {
         List<BatchAppNotice> list = batchAppNoticeService.selectBatchAppNoticeList(batchAppNotice);
         ExcelUtil<BatchAppNotice> util = new ExcelUtil<BatchAppNotice>(BatchAppNotice.class);
-        return util.exportExcel(list, "APP公告数据");
+        util.exportExcel(response, list, "APP公告数据");
     }
 
     /**
