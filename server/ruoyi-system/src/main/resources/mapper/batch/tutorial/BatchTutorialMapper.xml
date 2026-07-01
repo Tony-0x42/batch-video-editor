@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.batch.tutorial.mapper.BatchTutorialMapper">
+
+    <resultMap type="com.ruoyi.batch.tutorial.domain.BatchTutorial" id="BatchTutorialResult">
+        <id     property="tutorialId"       column="tutorial_id"       />
+        <result property="tutorialTitle"    column="tutorial_title"    />
+        <result property="tutorialType"     column="tutorial_type"     />
+        <result property="categoryId"       column="category_id"       />
+        <result property="categoryName"     column="category_name"     />
+        <result property="coverUrl"         column="cover_url"         />
+        <result property="videoUrl"         column="video_url"         />
+        <result property="documentContent"  column="document_content"  />
+        <result property="intro"            column="intro"             />
+        <result property="sortWeight"       column="sort_weight"       />
+        <result property="viewCount"        column="view_count"        />
+        <result property="status"           column="status"            />
+        <result property="createBy"         column="create_by"         />
+        <result property="createTime"       column="create_time"       />
+        <result property="updateBy"         column="update_by"         />
+        <result property="updateTime"       column="update_time"       />
+        <result property="remark"           column="remark"            />
+    </resultMap>
+
+    <sql id="selectBatchTutorialVo">
+        select t.tutorial_id, t.tutorial_title, t.tutorial_type, t.category_id,
+               c.category_name, t.cover_url, t.video_url,
+               cast(t.document_content as char) as document_content,
+               t.intro, t.sort_weight, t.view_count, t.status,
+               t.create_by, t.create_time, t.update_by, t.update_time, t.remark
+        from batch_tutorial t
+        left join batch_tutorial_category c on t.category_id = c.category_id and c.del_flag = 0
+    </sql>
+
+    <select id="selectTutorialById" parameterType="Long" resultMap="BatchTutorialResult">
+        <include refid="selectBatchTutorialVo"/>
+        where t.tutorial_id = #{tutorialId} and t.del_flag = 0
+    </select>
+
+    <select id="selectTutorialList" parameterType="com.ruoyi.batch.tutorial.domain.BatchTutorial" resultMap="BatchTutorialResult">
+        <include refid="selectBatchTutorialVo"/>
+        <where>
+            t.del_flag = 0
+            <if test="tutorialTitle != null and tutorialTitle != ''">
+                AND t.tutorial_title like concat('%', #{tutorialTitle}, '%')
+            </if>
+            <if test="tutorialType != null and tutorialType != ''">
+                AND t.tutorial_type = #{tutorialType}
+            </if>
+            <if test="categoryId != null">
+                AND t.category_id = #{categoryId}
+            </if>
+            <if test="status != null and status != ''">
+                AND t.status = #{status}
+            </if>
+        </where>
+        order by t.sort_weight asc, t.tutorial_id desc
+    </select>
+
+    <insert id="insertTutorial" parameterType="com.ruoyi.batch.tutorial.domain.BatchTutorial" useGeneratedKeys="true" keyProperty="tutorialId">
+        insert into batch_tutorial
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="tutorialTitle != null and tutorialTitle != ''">tutorial_title,</if>
+            <if test="tutorialType != null and tutorialType != ''">tutorial_type,</if>
+            <if test="categoryId != null">category_id,</if>
+            <if test="coverUrl != null and coverUrl != ''">cover_url,</if>
+            <if test="videoUrl != null and videoUrl != ''">video_url,</if>
+            <if test="documentContent != null and documentContent != ''">document_content,</if>
+            <if test="intro != null and intro != ''">intro,</if>
+            <if test="sortWeight != null">sort_weight,</if>
+            <if test="viewCount != null">view_count,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="tutorialTitle != null and tutorialTitle != ''">#{tutorialTitle},</if>
+            <if test="tutorialType != null and tutorialType != ''">#{tutorialType},</if>
+            <if test="categoryId != null">#{categoryId},</if>
+            <if test="coverUrl != null and coverUrl != ''">#{coverUrl},</if>
+            <if test="videoUrl != null and videoUrl != ''">#{videoUrl},</if>
+            <if test="documentContent != null and documentContent != ''">#{documentContent},</if>
+            <if test="intro != null and intro != ''">#{intro},</if>
+            <if test="sortWeight != null">#{sortWeight},</if>
+            <if test="viewCount != null">#{viewCount},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateTutorial" parameterType="com.ruoyi.batch.tutorial.domain.BatchTutorial">
+        update batch_tutorial
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="tutorialTitle != null and tutorialTitle != ''">tutorial_title = #{tutorialTitle},</if>
+            <if test="tutorialType != null and tutorialType != ''">tutorial_type = #{tutorialType},</if>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="coverUrl != null">cover_url = #{coverUrl},</if>
+            <if test="videoUrl != null">video_url = #{videoUrl},</if>
+            <if test="documentContent != null">document_content = #{documentContent},</if>
+            <if test="intro != null">intro = #{intro},</if>
+            <if test="sortWeight != null">sort_weight = #{sortWeight},</if>
+            <if test="viewCount != null">view_count = #{viewCount},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </trim>
+        where tutorial_id = #{tutorialId} and del_flag = 0
+    </update>
+
+    <update id="deleteTutorialById" parameterType="Long">
+        update batch_tutorial set del_flag = 2 where tutorial_id = #{tutorialId}
+    </update>
+
+    <update id="deleteTutorialByIds">
+        update batch_tutorial set del_flag = 2 where tutorial_id in
+        <foreach collection="array" item="tutorialId" open="(" separator="," close=")">
+            #{tutorialId}
+        </foreach>
+    </update>
+
+    <select id="countByCategoryId" parameterType="Long" resultType="int">
+        select count(*) from batch_tutorial where category_id = #{categoryId} and del_flag = 0
+    </select>
+
+</mapper>

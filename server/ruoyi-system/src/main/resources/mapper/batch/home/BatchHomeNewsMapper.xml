@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.batch.home.mapper.BatchHomeNewsMapper">
+
+    <resultMap type="com.ruoyi.batch.home.domain.BatchHomeNews" id="BatchHomeNewsResult">
+        <id     property="newsId"        column="news_id"        />
+        <result property="newsTitle"     column="news_title"     />
+        <result property="championName"  column="champion_name"  />
+        <result property="salesAmount"   column="sales_amount"   />
+        <result property="status"        column="status"         />
+        <result property="delFlag"       column="del_flag"       />
+        <result property="createBy"      column="create_by"      />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"      column="update_by"      />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"        column="remark"         />
+    </resultMap>
+
+    <sql id="selectBatchHomeNewsVo">
+        select news_id, news_title, champion_name, sales_amount, status, del_flag, create_by, create_time, update_by, update_time, remark
+        from batch_home_news
+    </sql>
+
+    <select id="selectBatchHomeNewsList" parameterType="com.ruoyi.batch.home.domain.BatchHomeNews" resultMap="BatchHomeNewsResult">
+        <include refid="selectBatchHomeNewsVo"/>
+        where del_flag = '0'
+        <if test="newsTitle != null and newsTitle != ''"> and news_title like concat('%', #{newsTitle}, '%') </if>
+        <if test="championName != null and championName != ''"> and champion_name like concat('%', #{championName}, '%') </if>
+        <if test="status != null and status != ''"> and status = #{status} </if>
+        order by create_time desc
+    </select>
+
+    <select id="selectBatchHomeNewsById" parameterType="Long" resultMap="BatchHomeNewsResult">
+        <include refid="selectBatchHomeNewsVo"/>
+        where news_id = #{newsId} and del_flag = '0'
+    </select>
+
+    <insert id="insertBatchHomeNews" parameterType="com.ruoyi.batch.home.domain.BatchHomeNews" useGeneratedKeys="true" keyProperty="newsId">
+        insert into batch_home_news
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="newsTitle != null">news_title,</if>
+            <if test="championName != null">champion_name,</if>
+            <if test="salesAmount != null">sales_amount,</if>
+            <if test="status != null">status,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="remark != null">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="newsTitle != null">#{newsTitle},</if>
+            <if test="championName != null">#{championName},</if>
+            <if test="salesAmount != null">#{salesAmount},</if>
+            <if test="status != null">#{status},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="remark != null">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="updateBatchHomeNews" parameterType="com.ruoyi.batch.home.domain.BatchHomeNews">
+        update batch_home_news
+        <set>
+            <if test="newsTitle != null">news_title = #{newsTitle},</if>
+            <if test="championName != null">champion_name = #{championName},</if>
+            <if test="salesAmount != null">sales_amount = #{salesAmount},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </set>
+        where news_id = #{newsId}
+    </update>
+
+    <update id="deleteBatchHomeNewsByIds">
+        update batch_home_news set del_flag = '2' where news_id in
+        <foreach collection="array" item="newsId" open="(" separator="," close=")">
+            #{newsId}
+        </foreach>
+    </update>
+
+</mapper>

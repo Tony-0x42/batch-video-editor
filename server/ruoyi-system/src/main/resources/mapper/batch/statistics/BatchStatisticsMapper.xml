@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.batch.statistics.mapper.BatchStatisticsMapper">
+
+    <resultMap type="com.ruoyi.batch.statistics.domain.BatchStatisticsOverview" id="BatchStatisticsOverviewResult">
+        <result property="branchTotal"                    column="branch_total"                     />
+        <result property="providerTotal"                  column="provider_total"                   />
+        <result property="individualTotal"                column="individual_total"                 />
+        <result property="accountTotal"                   column="account_total"                    />
+        <result property="accountTodayNew"                column="account_today_new"                />
+        <result property="computingTodayConsume"          column="computing_today_consume"          />
+        <result property="videoTodayGenerate"             column="video_today_generate"             />
+        <result property="qrScanToday"                    column="qr_scan_today"                    />
+        <result property="qrDownloadToday"                column="qr_download_today"                />
+        <result property="qrRegisterToday"                column="qr_register_today"                />
+        <result property="newsSalesAmount"                column="news_sales_amount"                />
+        <result property="branchServiceProviderCount"     column="branch_service_provider_count"    />
+        <result property="branchIndividualCount"          column="branch_individual_count"          />
+        <result property="branchServiceProviderRemain"    column="branch_service_provider_remain"   />
+        <result property="branchMaxServiceProviderRemain" column="branch_max_service_provider_remain"/>
+    </resultMap>
+
+    <resultMap type="com.ruoyi.batch.statistics.domain.BatchAccountStat" id="BatchAccountStatResult">
+        <id     property="customerId"   column="customer_id"   />
+        <result property="customerType" column="customer_type" />
+        <result property="customerName" column="customer_name" />
+        <result property="contactName"  column="contact_name"  />
+        <result property="phone"        column="phone"         />
+        <result property="parentPhone"  column="parent_phone"  />
+        <result property="branchPhone"  column="branch_phone"  />
+        <result property="status"       column="status"        />
+        <result property="createTime"   column="create_time"   />
+    </resultMap>
+
+    <resultMap type="com.ruoyi.batch.statistics.domain.BatchComputingStat" id="BatchComputingStatResult">
+        <id     property="logId"           column="log_id"           />
+        <result property="phone"           column="phone"            />
+        <result property="customerName"    column="customer_name"    />
+        <result property="operationType"   column="operation_type"   />
+        <result property="consumeValue"    column="consume_value"    />
+        <result property="remainValue"     column="remain_value"     />
+        <result property="videoGroupName"  column="video_group_name" />
+        <result property="createTime"      column="create_time"      />
+    </resultMap>
+
+    <resultMap type="com.ruoyi.batch.statistics.domain.BatchVideoGenerateStat" id="BatchVideoGenerateStatResult">
+        <id     property="logId"          column="log_id"          />
+        <result property="phone"          column="phone"           />
+        <result property="customerName"   column="customer_name"   />
+        <result property="videoGroupName" column="video_group_name"/>
+        <result property="generateCount"  column="generate_count"  />
+        <result property="status"         column="status"          />
+        <result property="createTime"     column="create_time"     />
+    </resultMap>
+
+    <resultMap type="com.ruoyi.batch.statistics.domain.BatchQrCodePromotionStat" id="BatchQrCodePromotionStatResult">
+        <id     property="statId"       column="stat_id"       />
+        <result property="phone"        column="phone"         />
+        <result property="customerName" column="customer_name" />
+        <result property="customerType" column="customer_type" />
+        <result property="scanCount"    column="scan_count"    />
+        <result property="downloadCount"column="download_count"/>
+        <result property="registerCount"column="register_count"/>
+        <result property="statDate"     column="stat_date"     />
+    </resultMap>
+
+    <resultMap type="com.ruoyi.batch.statistics.domain.BatchNewsStat" id="BatchNewsStatResult">
+        <id     property="newsId"      column="news_id"      />
+        <result property="newsTitle"   column="news_title"   />
+        <result property="championName"column="champion_name"/>
+        <result property="salesAmount" column="sales_amount" />
+        <result property="status"      column="status"       />
+        <result property="updateTime"  column="update_time"  />
+    </resultMap>
+
+    <resultMap type="com.ruoyi.batch.statistics.domain.BatchAccountTypePie" id="BatchAccountTypePieResult">
+        <result property="name"  column="name"  />
+        <result property="value" column="value" />
+    </resultMap>
+
+    <!-- 账号数据范围过滤：分公司按 branch_phone 或自身 phone -->
+    <sql id="accountBranchFilter">
+        <if test="branchPhone != null and branchPhone != ''">
+            AND (c.branch_phone = #{branchPhone} OR c.phone = #{branchPhone})
+        </if>
+    </sql>
+
+    <!-- 日志类数据范围过滤：通过手机号关联客户表 -->
+    <sql id="logBranchFilter">
+        <if test="branchPhone != null and branchPhone != ''">
+            AND (c.branch_phone = #{branchPhone} OR c.phone = #{branchPhone})
+        </if>
+    </sql>
+
+    <!-- 今日概览指标 -->
+    <select id="selectOverview" parameterType="com.ruoyi.batch.statistics.domain.BatchStatisticsQuery" resultMap="BatchStatisticsOverviewResult">
+        SELECT
+            (SELECT COUNT(*) FROM batch_customer WHERE del_flag = 0 AND customer_type = 1
+                <if test="branchPhone != null and branchPhone != ''"> AND phone = #{branchPhone} </if>
+            ) AS branch_total,
+            (SELECT COUNT(*) FROM batch_customer WHERE del_flag = 0 AND customer_type = 2
+                <if test="branchPhone != null and branchPhone != ''"> AND branch_phone = #{branchPhone} </if>
+            ) AS provider_total,
+            (SELECT COUNT(*) FROM batch_customer WHERE del_flag = 0 AND customer_type = 3
+                <if test="branchPhone != null and branchPhone != ''"> AND branch_phone = #{branchPhone} </if>
+            ) AS individual_total,
+            (SELECT COUNT(*) FROM batch_customer WHERE del_flag = 0
+                <if test="branchPhone != null and branchPhone != ''"> AND (branch_phone = #{branchPhone} OR phone = #{branchPhone}) </if>
+            ) AS account_total,
+            (SELECT COUNT(*) FROM batch_customer WHERE del_flag = 0 AND DATE(create_time) = CURDATE()
+                <if test="branchPhone != null and branchPhone != ''"> AND (branch_phone = #{branchPhone} OR phone = #{branchPhone}) </if>
+            ) AS account_today_new,
+            (SELECT COALESCE(SUM(cpl.consume_value), 0) FROM batch_computing_power_log cpl
+                <if test="branchPhone != null and branchPhone != ''">
+                INNER JOIN batch_customer c ON cpl.phone = c.phone AND c.del_flag = 0 AND (c.branch_phone = #{branchPhone} OR c.phone = #{branchPhone})
+                </if>
+                WHERE DATE(cpl.create_time) = CURDATE()
+            ) AS computing_today_consume,
+            (SELECT COALESCE(SUM(vgl.generate_count), 0) FROM batch_video_generate_log vgl
+                <if test="branchPhone != null and branchPhone != ''">
+                INNER JOIN batch_customer c ON vgl.phone = c.phone AND c.del_flag = 0 AND (c.branch_phone = #{branchPhone} OR c.phone = #{branchPhone})
+                </if>
+                WHERE DATE(vgl.create_time) = CURDATE() AND vgl.status = 0
+            ) AS video_today_generate,
+            (SELECT COALESCE(SUM(qcs.scan_count), 0) FROM batch_qr_code_stat qcs
+                <if test="branchPhone != null and branchPhone != ''">
+                INNER JOIN batch_customer c ON qcs.phone = c.phone AND c.del_flag = 0 AND (c.branch_phone = #{branchPhone} OR c.phone = #{branchPhone})
+                </if>
+                WHERE qcs.stat_date = CURDATE()
+            ) AS qr_scan_today,
+            (SELECT COALESCE(SUM(qcs.download_count), 0) FROM batch_qr_code_stat qcs
+                <if test="branchPhone != null and branchPhone != ''">
+                INNER JOIN batch_customer c ON qcs.phone = c.phone AND c.del_flag = 0 AND (c.branch_phone = #{branchPhone} OR c.phone = #{branchPhone})
+                </if>
+                WHERE qcs.stat_date = CURDATE()
+            ) AS qr_download_today,
+            (SELECT COALESCE(SUM(qcs.register_count), 0) FROM batch_qr_code_stat qcs
+                <if test="branchPhone != null and branchPhone != ''">
+                INNER JOIN batch_customer c ON qcs.phone = c.phone AND c.del_flag = 0 AND (c.branch_phone = #{branchPhone} OR c.phone = #{branchPhone})
+                </if>
+                WHERE qcs.stat_date = CURDATE()
+            ) AS qr_register_today,
+            (SELECT COALESCE(SUM(sales_amount), 0) FROM batch_home_news WHERE del_flag = 0 AND status = 0 AND DATE(update_time) = CURDATE()) AS news_sales_amount,
+            (SELECT COUNT(*) FROM batch_customer WHERE del_flag = 0 AND customer_type = 2 AND branch_phone = #{branchPhone}) AS branch_service_provider_count,
+            (SELECT COUNT(*) FROM batch_customer WHERE del_flag = 0 AND customer_type = 3 AND branch_phone = #{branchPhone}) AS branch_individual_count,
+            (
+                (SELECT COALESCE(SUM(max_individual), 0) FROM batch_customer WHERE del_flag = 0 AND customer_type = 2 AND branch_phone = #{branchPhone})
+                - (SELECT COUNT(*) FROM batch_customer WHERE del_flag = 0 AND customer_type = 3 AND branch_phone = #{branchPhone})
+            ) AS branch_service_provider_remain,
+            (
+                (SELECT COALESCE(MAX(max_service_provider), 0) FROM batch_customer WHERE del_flag = 0 AND customer_type = 1 AND phone = #{branchPhone})
+                - (SELECT COUNT(*) FROM batch_customer WHERE del_flag = 0 AND customer_type = 2 AND branch_phone = #{branchPhone})
+            ) AS branch_max_service_provider_remain
+    </select>
+
+    <!-- 账号数据明细列表 -->
+    <select id="selectAccountList" parameterType="com.ruoyi.batch.statistics.domain.BatchStatisticsQuery" resultMap="BatchAccountStatResult">
+        SELECT c.customer_id, c.customer_type, c.customer_name, c.contact_name, c.phone, c.parent_phone, c.branch_phone, c.status, c.create_time
+        FROM batch_customer c
+        WHERE c.del_flag = 0
+        <if test="customerType != null"> AND c.customer_type = #{customerType} </if>
+        <include refid="accountBranchFilter"/>
+        <if test="startDate != null"> AND DATE(c.create_time) >= #{startDate} </if>
+        <if test="endDate != null"> AND DATE(c.create_time) <= #{endDate} </if>
+        ORDER BY c.create_time DESC
+    </select>
+
+    <!-- 算力消耗明细列表 -->
+    <select id="selectComputingList" parameterType="com.ruoyi.batch.statistics.domain.BatchStatisticsQuery" resultMap="BatchComputingStatResult">
+        SELECT l.log_id, l.phone, c.customer_name, l.operation_type, l.consume_value, l.remain_value, l.video_group_name, l.create_time
+        FROM batch_computing_power_log l
+        LEFT JOIN batch_customer c ON l.phone = c.phone AND c.del_flag = 0
+        WHERE 1 = 1
+        <include refid="logBranchFilter"/>
+        <if test="startDate != null"> AND DATE(l.create_time) >= #{startDate} </if>
+        <if test="endDate != null"> AND DATE(l.create_time) <= #{endDate} </if>
+        ORDER BY l.create_time DESC
+    </select>
+
+    <!-- 视频生成明细列表 -->
+    <select id="selectVideoList" parameterType="com.ruoyi.batch.statistics.domain.BatchStatisticsQuery" resultMap="BatchVideoGenerateStatResult">
+        SELECT l.log_id, l.phone, c.customer_name, l.video_group_name, l.generate_count, l.status, l.create_time
+        FROM batch_video_generate_log l
+        LEFT JOIN batch_customer c ON l.phone = c.phone AND c.del_flag = 0
+        WHERE 1 = 1
+        <include refid="logBranchFilter"/>
+        <if test="startDate != null"> AND DATE(l.create_time) >= #{startDate} </if>
+        <if test="endDate != null"> AND DATE(l.create_time) <= #{endDate} </if>
+        ORDER BY l.create_time DESC
+    </select>
+
+    <!-- 二维码推广明细列表 -->
+    <select id="selectQrCodeList" parameterType="com.ruoyi.batch.statistics.domain.BatchStatisticsQuery" resultMap="BatchQrCodePromotionStatResult">
+        SELECT s.stat_id, s.phone, c.customer_name, c.customer_type, s.scan_count, s.download_count, s.register_count, s.stat_date
+        FROM batch_qr_code_stat s
+        LEFT JOIN batch_customer c ON s.phone = c.phone AND c.del_flag = 0
+        WHERE 1 = 1
+        <include refid="logBranchFilter"/>
+        <if test="startDate != null"> AND s.stat_date >= #{startDate} </if>
+        <if test="endDate != null"> AND s.stat_date <= #{endDate} </if>
+        ORDER BY s.stat_date DESC, s.stat_id DESC
+    </select>
+
+    <!-- 业绩喜报明细列表 -->
+    <select id="selectNewsList" parameterType="com.ruoyi.batch.statistics.domain.BatchStatisticsQuery" resultMap="BatchNewsStatResult">
+        SELECT n.news_id, n.news_title, n.champion_name, n.sales_amount, n.status, n.update_time
+        FROM batch_home_news n
+        WHERE n.del_flag = 0
+        <if test="startDate != null"> AND DATE(n.update_time) >= #{startDate} </if>
+        <if test="endDate != null"> AND DATE(n.update_time) <= #{endDate} </if>
+        ORDER BY n.update_time DESC
+    </select>
+
+    <!-- 新增账号趋势 -->
+    <select id="selectAccountTrend" parameterType="com.ruoyi.batch.statistics.domain.BatchStatisticsQuery" resultType="java.util.HashMap">
+        SELECT DATE(create_time) AS stat_date, COUNT(*) AS total
+        FROM batch_customer
+        WHERE del_flag = 0
+        <if test="branchPhone != null and branchPhone != ''"> AND (branch_phone = #{branchPhone} OR phone = #{branchPhone}) </if>
+        <if test="startDate != null"> AND DATE(create_time) >= #{startDate} </if>
+        <if test="endDate != null"> AND DATE(create_time) <= #{endDate} </if>
+        GROUP BY DATE(create_time)
+        ORDER BY stat_date ASC
+    </select>
+
+    <!-- 算力消耗趋势 -->
+    <select id="selectComputingTrend" parameterType="com.ruoyi.batch.statistics.domain.BatchStatisticsQuery" resultType="java.util.HashMap">
+        SELECT DATE(l.create_time) AS stat_date, COALESCE(SUM(l.consume_value), 0) AS total
+        FROM batch_computing_power_log l
+        LEFT JOIN batch_customer c ON l.phone = c.phone AND c.del_flag = 0
+        WHERE 1 = 1
+        <include refid="logBranchFilter"/>
+        <if test="startDate != null"> AND DATE(l.create_time) >= #{startDate} </if>
+        <if test="endDate != null"> AND DATE(l.create_time) <= #{endDate} </if>
+        GROUP BY DATE(l.create_time)
+        ORDER BY stat_date ASC
+    </select>
+
+    <!-- 视频生成趋势 -->
+    <select id="selectVideoTrend" parameterType="com.ruoyi.batch.statistics.domain.BatchStatisticsQuery" resultType="java.util.HashMap">
+        SELECT DATE(l.create_time) AS stat_date, COALESCE(SUM(l.generate_count), 0) AS total
+        FROM batch_video_generate_log l
+        LEFT JOIN batch_customer c ON l.phone = c.phone AND c.del_flag = 0
+        WHERE l.status = 0
+        <include refid="logBranchFilter"/>
+        <if test="startDate != null"> AND DATE(l.create_time) >= #{startDate} </if>
+        <if test="endDate != null"> AND DATE(l.create_time) <= #{endDate} </if>
+        GROUP BY DATE(l.create_time)
+        ORDER BY stat_date ASC
+    </select>
+
+    <!-- 二维码扫码趋势 -->
+    <select id="selectQrScanTrend" parameterType="com.ruoyi.batch.statistics.domain.BatchStatisticsQuery" resultType="java.util.HashMap">
+        SELECT s.stat_date, COALESCE(SUM(s.scan_count), 0) AS total
+        FROM batch_qr_code_stat s
+        LEFT JOIN batch_customer c ON s.phone = c.phone AND c.del_flag = 0
+        WHERE 1 = 1
+        <include refid="logBranchFilter"/>
+        <if test="startDate != null"> AND s.stat_date >= #{startDate} </if>
+        <if test="endDate != null"> AND s.stat_date <= #{endDate} </if>
+        GROUP BY s.stat_date
+        ORDER BY s.stat_date ASC
+    </select>
+
+    <!-- 账号类型分布 -->
+    <select id="selectAccountTypePie" parameterType="com.ruoyi.batch.statistics.domain.BatchStatisticsQuery" resultMap="BatchAccountTypePieResult">
+        SELECT
+            CASE customer_type
+                WHEN 1 THEN '分公司'
+                WHEN 2 THEN '服务商'
+                WHEN 3 THEN '个人'
+                ELSE '未知'
+            END AS name,
+            COUNT(*) AS value
+        FROM batch_customer
+        WHERE del_flag = 0
+        <if test="branchPhone != null and branchPhone != ''"> AND (branch_phone = #{branchPhone} OR phone = #{branchPhone}) </if>
+        GROUP BY customer_type
+    </select>
+
+</mapper>

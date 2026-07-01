@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.batch.customer.mapper.BatchCustomerMapper">
+
+    <resultMap type="com.ruoyi.batch.customer.domain.BatchCustomer" id="BatchCustomerResult">
+        <id     property="customerId"              column="customer_id"              />
+        <result property="customerType"            column="customer_type"            />
+        <result property="customerName"            column="customer_name"            />
+        <result property="contactName"             column="contact_name"             />
+        <result property="phone"                   column="phone"                    />
+        <result property="parentPhone"             column="parent_phone"             />
+        <result property="branchPhone"             column="branch_phone"             />
+        <result property="maxServiceProvider"      column="max_service_provider"     />
+        <result property="totalIndividualCapacity" column="total_individual_capacity"/>
+        <result property="maxIndividual"           column="max_individual"           />
+        <result property="computingPowerTotal"     column="computing_power_total"    />
+        <result property="computingPowerUsed"      column="computing_power_used"     />
+        <result property="computingPowerRemain"    column="computing_power_remain"   />
+        <result property="vipExpireDate"           column="vip_expire_date"          />
+        <result property="qrCodeUrl"               column="qr_code_url"              />
+        <result property="qrCodeKey"               column="qr_code_key"              />
+        <result property="status"                  column="status"                   />
+        <result property="delFlag"                 column="del_flag"                 />
+        <result property="createBy"                column="create_by"                />
+        <result property="createTime"              column="create_time"              />
+        <result property="updateBy"                column="update_by"                />
+        <result property="updateTime"              column="update_time"              />
+        <result property="remark"                  column="remark"                   />
+    </resultMap>
+
+    <sql id="selectBatchCustomerVo">
+        select c.customer_id, c.customer_type, c.customer_name, c.contact_name, c.phone,
+               c.parent_phone, c.branch_phone, c.max_service_provider, c.total_individual_capacity,
+               c.max_individual, c.computing_power_total, c.computing_power_used,
+               c.computing_power_remain, c.vip_expire_date, c.qr_code_url, c.qr_code_key,
+               c.status, c.del_flag, c.create_by, c.create_time, c.update_by, c.update_time, c.remark
+        from batch_customer c
+    </sql>
+
+    <sql id="whereBatchCustomer">
+        where c.del_flag = 0
+        <if test="phone != null and phone != ''">
+            and c.phone like concat('%', #{phone}, '%')
+        </if>
+        <if test="customerName != null and customerName != ''">
+            and c.customer_name like concat('%', #{customerName}, '%')
+        </if>
+        <if test="contactName != null and contactName != ''">
+            and c.contact_name like concat('%', #{contactName}, '%')
+        </if>
+        <if test="customerType != null">
+            and c.customer_type = #{customerType}
+        </if>
+        <if test="status != null">
+            and c.status = #{status}
+        </if>
+        <if test="parentPhone != null and parentPhone != ''">
+            and c.parent_phone = #{parentPhone}
+        </if>
+        <if test="branchPhone != null and branchPhone != ''">
+            and c.branch_phone = #{branchPhone}
+        </if>
+        <if test="vipStatus != null">
+            <choose>
+                <when test="vipStatus == 0">
+                    and c.vip_expire_date is not null and c.vip_expire_date &gt;= curdate()
+                </when>
+                <when test="vipStatus == 1">
+                    and (c.vip_expire_date is null or c.vip_expire_date &lt; curdate())
+                </when>
+            </choose>
+        </if>
+        <if test="params != null and params.beginTime != null and params.beginTime != ''">
+            and date_format(c.create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+        </if>
+        <if test="params != null and params.endTime != null and params.endTime != ''">
+            and date_format(c.create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+        </if>
+    </sql>
+
+    <select id="selectBatchCustomerList" parameterType="com.ruoyi.batch.customer.domain.BatchCustomer" resultMap="BatchCustomerResult">
+        <include refid="selectBatchCustomerVo"/>
+        <include refid="whereBatchCustomer"/>
+        order by c.create_time desc
+    </select>
+
+    <select id="selectBatchCustomerById" parameterType="Long" resultMap="BatchCustomerResult">
+        <include refid="selectBatchCustomerVo"/>
+        where c.customer_id = #{customerId}
+    </select>
+
+    <select id="selectBatchCustomerByPhone" parameterType="String" resultMap="BatchCustomerResult">
+        <include refid="selectBatchCustomerVo"/>
+        where c.phone = #{phone} and c.del_flag = 0
+    </select>
+
+    <select id="countByParentPhone" parameterType="String" resultType="int">
+        select count(*) from batch_customer where parent_phone = #{parentPhone} and del_flag = 0
+    </select>
+
+    <select id="countByBranchPhone" parameterType="String" resultType="int">
+        select count(*) from batch_customer where branch_phone = #{branchPhone} and del_flag = 0
+    </select>
+
+    <select id="selectByParentPhone" parameterType="String" resultMap="BatchCustomerResult">
+        <include refid="selectBatchCustomerVo"/>
+        where c.parent_phone = #{parentPhone} and c.del_flag = 0
+        order by c.create_time desc
+    </select>
+
+    <select id="checkPhoneUnique" resultType="int">
+        select count(*) from batch_customer where phone = #{phone} and del_flag = 0
+        <if test="excludeId != null">
+            and customer_id != #{excludeId}
+        </if>
+    </select>
+
+    <insert id="insertBatchCustomer" parameterType="com.ruoyi.batch.customer.domain.BatchCustomer" useGeneratedKeys="true" keyProperty="customerId">
+        insert into batch_customer
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="customerType != null">customer_type,</if>
+            <if test="customerName != null and customerName != ''">customer_name,</if>
+            <if test="contactName != null and contactName != ''">contact_name,</if>
+            <if test="phone != null and phone != ''">phone,</if>
+            <if test="parentPhone != null">parent_phone,</if>
+            <if test="branchPhone != null">branch_phone,</if>
+            <if test="maxServiceProvider != null">max_service_provider,</if>
+            <if test="totalIndividualCapacity != null">total_individual_capacity,</if>
+            <if test="maxIndividual != null">max_individual,</if>
+            <if test="computingPowerTotal != null">computing_power_total,</if>
+            <if test="computingPowerUsed != null">computing_power_used,</if>
+            <if test="computingPowerRemain != null">computing_power_remain,</if>
+            <if test="vipExpireDate != null">vip_expire_date,</if>
+            <if test="qrCodeUrl != null">qr_code_url,</if>
+            <if test="qrCodeKey != null">qr_code_key,</if>
+            <if test="status != null">status,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="remark != null">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="customerType != null">#{customerType},</if>
+            <if test="customerName != null and customerName != ''">#{customerName},</if>
+            <if test="contactName != null and contactName != ''">#{contactName},</if>
+            <if test="phone != null and phone != ''">#{phone},</if>
+            <if test="parentPhone != null">#{parentPhone},</if>
+            <if test="branchPhone != null">#{branchPhone},</if>
+            <if test="maxServiceProvider != null">#{maxServiceProvider},</if>
+            <if test="totalIndividualCapacity != null">#{totalIndividualCapacity},</if>
+            <if test="maxIndividual != null">#{maxIndividual},</if>
+            <if test="computingPowerTotal != null">#{computingPowerTotal},</if>
+            <if test="computingPowerUsed != null">#{computingPowerUsed},</if>
+            <if test="computingPowerRemain != null">#{computingPowerRemain},</if>
+            <if test="vipExpireDate != null">#{vipExpireDate},</if>
+            <if test="qrCodeUrl != null">#{qrCodeUrl},</if>
+            <if test="qrCodeKey != null">#{qrCodeKey},</if>
+            <if test="status != null">#{status},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="remark != null">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="updateBatchCustomer" parameterType="com.ruoyi.batch.customer.domain.BatchCustomer">
+        update batch_customer
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="customerName != null and customerName != ''">customer_name = #{customerName},</if>
+            <if test="contactName != null">contact_name = #{contactName},</if>
+            <if test="parentPhone != null">parent_phone = #{parentPhone},</if>
+            <if test="branchPhone != null">branch_phone = #{branchPhone},</if>
+            <if test="maxServiceProvider != null">max_service_provider = #{maxServiceProvider},</if>
+            <if test="totalIndividualCapacity != null">total_individual_capacity = #{totalIndividualCapacity},</if>
+            <if test="maxIndividual != null">max_individual = #{maxIndividual},</if>
+            <if test="computingPowerTotal != null">computing_power_total = #{computingPowerTotal},</if>
+            <if test="computingPowerUsed != null">computing_power_used = #{computingPowerUsed},</if>
+            <if test="computingPowerRemain != null">computing_power_remain = #{computingPowerRemain},</if>
+            <if test="vipExpireDate != null">vip_expire_date = #{vipExpireDate},</if>
+            <if test="qrCodeUrl != null">qr_code_url = #{qrCodeUrl},</if>
+            <if test="qrCodeKey != null">qr_code_key = #{qrCodeKey},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </trim>
+        where customer_id = #{customerId}
+    </update>
+
+    <update id="updateQrCode" parameterType="com.ruoyi.batch.customer.domain.BatchCustomer">
+        update batch_customer
+        set qr_code_url = #{qrCodeUrl},
+            qr_code_key = #{qrCodeKey},
+            update_by = #{updateBy},
+            update_time = sysdate()
+        where customer_id = #{customerId}
+    </update>
+
+    <update id="deleteBatchCustomerByIds">
+        update batch_customer set del_flag = 2 where customer_id in
+        <foreach collection="array" item="customerId" open="(" separator="," close=")">
+            #{customerId}
+        </foreach>
+    </update>
+
+    <update id="updateVipExpireDate">
+        update batch_customer
+        set vip_expire_date = #{vipExpireDate},
+            update_time = sysdate()
+        where customer_id = #{customerId}
+    </update>
+
+    <update id="updateVipExpireDateBatch">
+        update batch_customer
+        set vip_expire_date = #{vipExpireDate},
+            update_time = sysdate()
+        where customer_id in
+        <foreach collection="customerIds" item="customerId" open="(" separator="," close=")">
+            #{customerId}
+        </foreach>
+    </update>
+
+</mapper>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.batch.home.mapper.BatchHomeTutorialEntryMapper">
+
+    <resultMap type="com.ruoyi.batch.home.domain.BatchHomeTutorialEntry" id="BatchHomeTutorialEntryResult">
+        <id     property="entryId"       column="entry_id"       />
+        <result property="title"         column="title"          />
+        <result property="coverUrl"      column="cover_url"      />
+        <result property="documentId"    column="document_id"    />
+        <result property="documentTitle" column="document_title" />
+        <result property="sortWeight"    column="sort_weight"    />
+        <result property="status"        column="status"         />
+        <result property="delFlag"       column="del_flag"       />
+        <result property="createBy"      column="create_by"      />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"      column="update_by"      />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"        column="remark"         />
+    </resultMap>
+
+    <resultMap type="com.ruoyi.batch.home.domain.BatchHomeDocumentOption" id="BatchHomeDocumentOptionResult">
+        <id     property="documentId"    column="document_id"    />
+        <result property="documentTitle" column="document_title" />
+    </resultMap>
+
+    <sql id="selectBatchHomeTutorialEntryVo">
+        select e.entry_id, e.title, e.cover_url, e.document_id, d.document_title, e.sort_weight, e.status, e.del_flag,
+               e.create_by, e.create_time, e.update_by, e.update_time, e.remark
+        from batch_home_tutorial_entry e
+        left join batch_document d on e.document_id = d.document_id and d.del_flag = '0'
+    </sql>
+
+    <select id="selectBatchHomeTutorialEntryList" parameterType="com.ruoyi.batch.home.domain.BatchHomeTutorialEntry" resultMap="BatchHomeTutorialEntryResult">
+        <include refid="selectBatchHomeTutorialEntryVo"/>
+        where e.del_flag = '0'
+        <if test="title != null and title != ''"> and e.title like concat('%', #{title}, '%') </if>
+        <if test="documentId != null"> and e.document_id = #{documentId} </if>
+        <if test="status != null and status != ''"> and e.status = #{status} </if>
+        order by e.sort_weight asc, e.create_time desc
+    </select>
+
+    <select id="selectBatchHomeTutorialEntryById" parameterType="Long" resultMap="BatchHomeTutorialEntryResult">
+        <include refid="selectBatchHomeTutorialEntryVo"/>
+        where e.entry_id = #{entryId} and e.del_flag = '0'
+    </select>
+
+    <insert id="insertBatchHomeTutorialEntry" parameterType="com.ruoyi.batch.home.domain.BatchHomeTutorialEntry" useGeneratedKeys="true" keyProperty="entryId">
+        insert into batch_home_tutorial_entry
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="title != null">title,</if>
+            <if test="coverUrl != null">cover_url,</if>
+            <if test="documentId != null">document_id,</if>
+            <if test="sortWeight != null">sort_weight,</if>
+            <if test="status != null">status,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="remark != null">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="title != null">#{title},</if>
+            <if test="coverUrl != null">#{coverUrl},</if>
+            <if test="documentId != null">#{documentId},</if>
+            <if test="sortWeight != null">#{sortWeight},</if>
+            <if test="status != null">#{status},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="remark != null">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="updateBatchHomeTutorialEntry" parameterType="com.ruoyi.batch.home.domain.BatchHomeTutorialEntry">
+        update batch_home_tutorial_entry
+        <set>
+            <if test="title != null">title = #{title},</if>
+            <if test="coverUrl != null">cover_url = #{coverUrl},</if>
+            <if test="documentId != null">document_id = #{documentId},</if>
+            <if test="sortWeight != null">sort_weight = #{sortWeight},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </set>
+        where entry_id = #{entryId}
+    </update>
+
+    <update id="deleteBatchHomeTutorialEntryByIds">
+        update batch_home_tutorial_entry set del_flag = '2' where entry_id in
+        <foreach collection="array" item="entryId" open="(" separator="," close=")">
+            #{entryId}
+        </foreach>
+    </update>
+
+    <select id="selectDocumentOptionList" resultMap="BatchHomeDocumentOptionResult">
+        select document_id, document_title
+        from batch_document
+        where status = '0' and del_flag = '0'
+        order by sort_weight asc, document_id desc
+    </select>
+
+</mapper>

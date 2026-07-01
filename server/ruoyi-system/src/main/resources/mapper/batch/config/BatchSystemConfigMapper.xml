@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.batch.config.mapper.BatchSystemConfigMapper">
+
+    <resultMap type="com.ruoyi.batch.config.domain.BatchSystemConfig" id="BatchSystemConfigResult">
+        <id     property="configId"     column="config_id"     />
+        <result property="configKey"    column="config_key"    />
+        <result property="configValue"  column="config_value"  />
+        <result property="configGroup"  column="config_group"  />
+        <result property="createBy"     column="create_by"     />
+        <result property="createTime"   column="create_time"   />
+        <result property="updateBy"     column="update_by"     />
+        <result property="updateTime"   column="update_time"   />
+        <result property="remark"       column="remark"        />
+    </resultMap>
+
+    <sql id="selectBatchSystemConfigVo">
+        select config_id, config_key, config_value, config_group, create_by, create_time, update_by, update_time, remark
+        from batch_system_config
+    </sql>
+
+    <select id="selectBatchSystemConfigList" parameterType="com.ruoyi.batch.config.domain.BatchSystemConfig" resultMap="BatchSystemConfigResult">
+        <include refid="selectBatchSystemConfigVo"/>
+        <where>
+            <if test="configKey != null and configKey != ''">
+                AND config_key like concat('%', #{configKey}, '%')
+            </if>
+            <if test="configGroup != null and configGroup != ''">
+                AND config_group = #{configGroup}
+            </if>
+            <if test="configValue != null and configValue != ''">
+                AND config_value like concat('%', #{configValue}, '%')
+            </if>
+        </where>
+        order by config_group, config_id
+    </select>
+
+    <select id="selectBatchSystemConfigByGroup" parameterType="String" resultMap="BatchSystemConfigResult">
+        <include refid="selectBatchSystemConfigVo"/>
+        where config_group = #{configGroup}
+        order by config_id
+    </select>
+
+    <select id="selectBatchSystemConfigByKey" parameterType="String" resultMap="BatchSystemConfigResult">
+        <include refid="selectBatchSystemConfigVo"/>
+        where config_key = #{configKey} limit 1
+    </select>
+
+    <select id="selectBatchSystemConfigById" parameterType="Long" resultMap="BatchSystemConfigResult">
+        <include refid="selectBatchSystemConfigVo"/>
+        where config_id = #{configId}
+    </select>
+
+    <insert id="insertBatchSystemConfig" parameterType="com.ruoyi.batch.config.domain.BatchSystemConfig">
+        insert into batch_system_config (
+            <if test="configKey != null and configKey != ''">config_key,</if>
+            <if test="configValue != null and configValue != ''">config_value,</if>
+            <if test="configGroup != null and configGroup != ''">config_group,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            create_time
+        ) values (
+            <if test="configKey != null and configKey != ''">#{configKey},</if>
+            <if test="configValue != null and configValue != ''">#{configValue},</if>
+            <if test="configGroup != null and configGroup != ''">#{configGroup},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate()
+        )
+    </insert>
+
+    <update id="updateBatchSystemConfig" parameterType="com.ruoyi.batch.config.domain.BatchSystemConfig">
+        update batch_system_config
+        <set>
+            <if test="configKey != null and configKey != ''">config_key = #{configKey},</if>
+            <if test="configValue != null">config_value = #{configValue},</if>
+            <if test="configGroup != null and configGroup != ''">config_group = #{configGroup},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </set>
+        where config_id = #{configId}
+    </update>
+
+    <delete id="deleteBatchSystemConfigByIds" parameterType="Long">
+        delete from batch_system_config where config_id in
+        <foreach item="configId" collection="array" open="(" separator="," close=")">
+            #{configId}
+        </foreach>
+    </delete>
+
+</mapper>

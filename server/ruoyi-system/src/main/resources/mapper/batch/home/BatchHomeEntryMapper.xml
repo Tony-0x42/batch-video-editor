@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.batch.home.mapper.BatchHomeEntryMapper">
+
+    <resultMap type="com.ruoyi.batch.home.domain.BatchHomeEntry" id="BatchHomeEntryResult">
+        <id     property="entryId"     column="entry_id"     />
+        <result property="entryName"   column="entry_name"   />
+        <result property="iconUrl"     column="icon_url"     />
+        <result property="targetType"  column="target_type"  />
+        <result property="targetValue" column="target_value" />
+        <result property="sortWeight"  column="sort_weight"  />
+        <result property="status"      column="status"       />
+        <result property="delFlag"     column="del_flag"     />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"  column="create_time"  />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"  column="update_time"  />
+        <result property="remark"      column="remark"       />
+    </resultMap>
+
+    <sql id="selectBatchHomeEntryVo">
+        select entry_id, entry_name, icon_url, target_type, target_value, sort_weight, status, del_flag, create_by, create_time, update_by, update_time, remark
+        from batch_home_entry
+    </sql>
+
+    <select id="selectBatchHomeEntryList" parameterType="com.ruoyi.batch.home.domain.BatchHomeEntry" resultMap="BatchHomeEntryResult">
+        <include refid="selectBatchHomeEntryVo"/>
+        where del_flag = '0'
+        <if test="entryName != null and entryName != ''"> and entry_name like concat('%', #{entryName}, '%') </if>
+        <if test="targetType != null and targetType != ''"> and target_type = #{targetType} </if>
+        <if test="status != null and status != ''"> and status = #{status} </if>
+        order by sort_weight asc, create_time desc
+    </select>
+
+    <select id="selectBatchHomeEntryById" parameterType="Long" resultMap="BatchHomeEntryResult">
+        <include refid="selectBatchHomeEntryVo"/>
+        where entry_id = #{entryId} and del_flag = '0'
+    </select>
+
+    <insert id="insertBatchHomeEntry" parameterType="com.ruoyi.batch.home.domain.BatchHomeEntry" useGeneratedKeys="true" keyProperty="entryId">
+        insert into batch_home_entry
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="entryName != null">entry_name,</if>
+            <if test="iconUrl != null">icon_url,</if>
+            <if test="targetType != null">target_type,</if>
+            <if test="targetValue != null">target_value,</if>
+            <if test="sortWeight != null">sort_weight,</if>
+            <if test="status != null">status,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="remark != null">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="entryName != null">#{entryName},</if>
+            <if test="iconUrl != null">#{iconUrl},</if>
+            <if test="targetType != null">#{targetType},</if>
+            <if test="targetValue != null">#{targetValue},</if>
+            <if test="sortWeight != null">#{sortWeight},</if>
+            <if test="status != null">#{status},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="remark != null">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="updateBatchHomeEntry" parameterType="com.ruoyi.batch.home.domain.BatchHomeEntry">
+        update batch_home_entry
+        <set>
+            <if test="entryName != null">entry_name = #{entryName},</if>
+            <if test="iconUrl != null">icon_url = #{iconUrl},</if>
+            <if test="targetType != null">target_type = #{targetType},</if>
+            <if test="targetValue != null">target_value = #{targetValue},</if>
+            <if test="sortWeight != null">sort_weight = #{sortWeight},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </set>
+        where entry_id = #{entryId}
+    </update>
+
+    <update id="deleteBatchHomeEntryByIds">
+        update batch_home_entry set del_flag = '2' where entry_id in
+        <foreach collection="array" item="entryId" open="(" separator="," close=")">
+            #{entryId}
+        </foreach>
+    </update>
+
+</mapper>

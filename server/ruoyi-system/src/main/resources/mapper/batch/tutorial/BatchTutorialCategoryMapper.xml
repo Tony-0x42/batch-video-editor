@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.batch.tutorial.mapper.BatchTutorialCategoryMapper">
+
+    <resultMap type="com.ruoyi.batch.tutorial.domain.BatchTutorialCategory" id="BatchTutorialCategoryResult">
+        <id     property="categoryId"   column="category_id"   />
+        <result property="categoryName" column="category_name" />
+        <result property="sortWeight"   column="sort_weight"   />
+        <result property="status"       column="status"        />
+        <result property="createTime"   column="create_time"   />
+        <result property="updateTime"   column="update_time"   />
+        <result property="remark"       column="remark"        />
+    </resultMap>
+
+    <sql id="selectBatchTutorialCategoryVo">
+        select category_id, category_name, sort_weight, status, create_time, update_time, remark
+        from batch_tutorial_category
+    </sql>
+
+    <select id="selectCategoryById" parameterType="Long" resultMap="BatchTutorialCategoryResult">
+        <include refid="selectBatchTutorialCategoryVo"/>
+        where category_id = #{categoryId} and del_flag = 0
+    </select>
+
+    <select id="selectCategoryList" parameterType="com.ruoyi.batch.tutorial.domain.BatchTutorialCategory" resultMap="BatchTutorialCategoryResult">
+        <include refid="selectBatchTutorialCategoryVo"/>
+        <where>
+            del_flag = 0
+            <if test="categoryName != null and categoryName != ''">
+                AND category_name like concat('%', #{categoryName}, '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+        order by sort_weight asc, category_id desc
+    </select>
+
+    <select id="selectCategoryAll" resultMap="BatchTutorialCategoryResult">
+        <include refid="selectBatchTutorialCategoryVo"/>
+        where del_flag = 0 and status = '0'
+        order by sort_weight asc, category_id desc
+    </select>
+
+    <insert id="insertCategory" parameterType="com.ruoyi.batch.tutorial.domain.BatchTutorialCategory" useGeneratedKeys="true" keyProperty="categoryId">
+        insert into batch_tutorial_category
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="categoryName != null and categoryName != ''">category_name,</if>
+            <if test="sortWeight != null">sort_weight,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="categoryName != null and categoryName != ''">#{categoryName},</if>
+            <if test="sortWeight != null">#{sortWeight},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateCategory" parameterType="com.ruoyi.batch.tutorial.domain.BatchTutorialCategory">
+        update batch_tutorial_category
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="categoryName != null and categoryName != ''">category_name = #{categoryName},</if>
+            <if test="sortWeight != null">sort_weight = #{sortWeight},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </trim>
+        where category_id = #{categoryId} and del_flag = 0
+    </update>
+
+    <update id="deleteCategoryById" parameterType="Long">
+        update batch_tutorial_category set del_flag = 2 where category_id = #{categoryId}
+    </update>
+
+    <update id="deleteCategoryByIds">
+        update batch_tutorial_category set del_flag = 2 where category_id in
+        <foreach collection="array" item="categoryId" open="(" separator="," close=")">
+            #{categoryId}
+        </foreach>
+    </update>
+
+</mapper>

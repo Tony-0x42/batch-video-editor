@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.batch.config.mapper.BatchAppVersionMapper">
+
+    <resultMap type="com.ruoyi.batch.config.domain.BatchAppVersion" id="BatchAppVersionResult">
+        <id     property="versionId"      column="version_id"      />
+        <result property="versionNo"      column="version_no"      />
+        <result property="platform"       column="platform"        />
+        <result property="updateType"     column="update_type"     />
+        <result property="updateContent"  column="update_content"  />
+        <result property="downloadUrl"    column="download_url"    />
+        <result property="publishTime"    column="publish_time"    />
+        <result property="status"         column="status"          />
+        <result property="delFlag"        column="del_flag"        />
+        <result property="createBy"       column="create_by"       />
+        <result property="createTime"     column="create_time"     />
+        <result property="updateBy"       column="update_by"       />
+        <result property="updateTime"     column="update_time"     />
+        <result property="remark"         column="remark"          />
+    </resultMap>
+
+    <sql id="selectBatchAppVersionVo">
+        select version_id, version_no, platform, update_type, update_content, download_url, publish_time, status, del_flag,
+               create_by, create_time, update_by, update_time, remark
+        from batch_app_version
+    </sql>
+
+    <select id="selectBatchAppVersionList" parameterType="com.ruoyi.batch.config.domain.BatchAppVersion" resultMap="BatchAppVersionResult">
+        <include refid="selectBatchAppVersionVo"/>
+        <where>
+            del_flag = 0
+            <if test="versionNo != null and versionNo != ''">
+                AND version_no like concat('%', #{versionNo}, '%')
+            </if>
+            <if test="platform != null">
+                AND platform = #{platform}
+            </if>
+            <if test="updateType != null">
+                AND update_type = #{updateType}
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+        order by platform, publish_time desc, version_id desc
+    </select>
+
+    <select id="selectBatchAppVersionById" parameterType="Long" resultMap="BatchAppVersionResult">
+        <include refid="selectBatchAppVersionVo"/>
+        where version_id = #{versionId} and del_flag = 0
+    </select>
+
+    <select id="checkVersionNoUnique" parameterType="com.ruoyi.batch.config.domain.BatchAppVersion" resultMap="BatchAppVersionResult">
+        <include refid="selectBatchAppVersionVo"/>
+        where version_no = #{versionNo} and platform = #{platform} and del_flag = 0 limit 1
+    </select>
+
+    <insert id="insertBatchAppVersion" parameterType="com.ruoyi.batch.config.domain.BatchAppVersion">
+        insert into batch_app_version (
+            <if test="versionNo != null and versionNo != ''">version_no,</if>
+            <if test="platform != null">platform,</if>
+            <if test="updateType != null">update_type,</if>
+            <if test="updateContent != null and updateContent != ''">update_content,</if>
+            <if test="downloadUrl != null and downloadUrl != ''">download_url,</if>
+            <if test="publishTime != null">publish_time,</if>
+            <if test="status != null">status,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            create_time
+        ) values (
+            <if test="versionNo != null and versionNo != ''">#{versionNo},</if>
+            <if test="platform != null">#{platform},</if>
+            <if test="updateType != null">#{updateType},</if>
+            <if test="updateContent != null and updateContent != ''">#{updateContent},</if>
+            <if test="downloadUrl != null and downloadUrl != ''">#{downloadUrl},</if>
+            <if test="publishTime != null">#{publishTime},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate()
+        )
+    </insert>
+
+    <update id="updateBatchAppVersion" parameterType="com.ruoyi.batch.config.domain.BatchAppVersion">
+        update batch_app_version
+        <set>
+            <if test="versionNo != null and versionNo != ''">version_no = #{versionNo},</if>
+            <if test="platform != null">platform = #{platform},</if>
+            <if test="updateType != null">update_type = #{updateType},</if>
+            <if test="updateContent != null">update_content = #{updateContent},</if>
+            <if test="downloadUrl != null">download_url = #{downloadUrl},</if>
+            <if test="publishTime != null">publish_time = #{publishTime},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </set>
+        where version_id = #{versionId}
+    </update>
+
+    <update id="deleteBatchAppVersionByIds" parameterType="Long">
+        update batch_app_version set del_flag = 2 where version_id in
+        <foreach item="versionId" collection="array" open="(" separator="," close=")">
+            #{versionId}
+        </foreach>
+    </update>
+
+</mapper>
