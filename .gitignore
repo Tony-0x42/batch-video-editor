@@ -1,0 +1,39 @@
+# Gradle files
+.gradle/
+build/
+*/build/
+!gradle-wrapper.jar
+
+# Local configuration file
+local.properties
+
+# Android Studio
+.idea/
+*.iml
+*.ipr
+*.iws
+.DS_Store
+/captures
+.externalNativeBuild
+.cxx/
+
+# Kotlin
+*.class
+*.kotlin_metadata
+*.kotlin_module
+
+# Log/OS Files
+*.log
+
+# Built application files
+*.apk
+*.ap_
+*.aab
+
+# Virtual machine crashes
+hs_err_pid*
+replay_pid*
+
+# Keystore files
+*.jks
+*.keystore

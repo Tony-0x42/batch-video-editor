@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">批量剪辑</string>
+
+    <!-- 底部导航 -->
+    <string name="nav_home">首页</string>
+    <string name="nav_ai_creation">AI云创</string>
+    <string name="nav_watermark">AI去水印</string>
+    <string name="nav_profile">我的</string>
+
+    <!-- 登录/注册 -->
+    <string name="login_title">登录</string>
+    <string name="phone_hint">请输入手机号</string>
+    <string name="password_hint">请输入密码</string>
+    <string name="confirm_password_hint">请再次输入密码</string>
+    <string name="login">登录</string>
+    <string name="register">注册</string>
+    <string name="agreement_prefix">我已阅读并同意</string>
+    <string name="user_agreement">《用户协议》</string>
+    <string name="privacy_policy">《隐私政策》</string>
+    <string name="and">和</string>
+    <string name="forget_password">忘记密码？</string>
+    <string name="no_account">还没有账号？</string>
+    <string name="has_account">已有账号？</string>
+    <string name="go_login">去登录</string>
+    <string name="parent_phone">上级手机号</string>
+
+    <!-- 首页 -->
+    <string name="home_title">批量剪辑</string>
+    <string name="learning">学习专区</string>
+    <string name="contact">信息咨询</string>
+    <string name="brand">品牌专区</string>
+    <string name="other_service">其他服务</string>
+    <string name="tutorial">教程文档</string>
+    <string name="announcement">业绩喜报</string>
+    <string name="search">搜索</string>
+
+    <!-- AI云创 -->
+    <string name="ai_creation_title">AI云创</string>
+    <string name="compute_power">算力</string>
+    <string name="total_compute_power">总算力: %1$d</string>
+    <string name="used_compute_power">已用: %1$d</string>
+    <string name="add_group">新增视频组</string>
+    <string name="edit_group">编辑视频组</string>
+    <string name="split">AI分割</string>
+    <string name="dubbing">AI配音</string>
+    <string name="bgm">背景音乐</string>
+    <string name="generate">AI生成</string>
+    <string name="keep_original_sound">保留原声</string>
+    <string name="clip">分镜头</string>
+    <string name="split_progress">分割进度</string>
+
+    <!-- AI去水印 -->
+    <string name="watermark_title">AI去水印</string>
+    <string name="link_hint">粘贴短视频分享链接</string>
+    <string name="parse">解析</string>
+    <string name="clear">清空</string>
+    <string name="save">保存</string>
+    <string name="video">视频</string>
+    <string name="image">图片</string>
+    <string name="text">文本</string>
+
+    <!-- 我的 -->
+    <string name="profile_title">我的</string>
+    <string name="edit_profile">编辑资料</string>
+    <string name="customer_service">联系客服</string>
+    <string name="douyin_account">抖音账号管理</string>
+    <string name="bind_wechat">绑定微信</string>
+    <string name="switch_account">切换账号</string>
+    <string name="logout_account">注销账号</string>
+    <string name="user_agreement_menu">用户协议</string>
+    <string name="privacy_policy_menu">隐私政策</string>
+    <string name="clear_cache">清理缓存</string>
+    <string name="check_update">检查版本</string>
+    <string name="logout">退出登录</string>
+    <string name="nickname">昵称</string>
+    <string name="phone">手机号</string>
+    <string name="vip">VIP</string>
+
+    <!-- 通用 -->
+    <string name="confirm">确定</string>
+    <string name="cancel">取消</string>
+    <string name="back">返回</string>
+    <string name="loading">加载中…</string>
+    <string name="retry">重试</string>
+    <string name="empty_data">暂无数据</string>
+    <string name="network_error">网络异常，请重试</string>
+    <string name="power_exhausted">当前算力已耗尽，请联系管理员增加算力额度</string>
+    <string name="confirm_delete">确认删除？</string>
+    <string name="confirm_logout">确认退出登录？</string>
+    <string name="confirm_delete_account">注销账号将清除全部数据，确认继续？</string>
+    <string name="phone_format_error">手机号格式错误</string>
+    <string name="password_length_error">密码长度应为6-20位</string>
+    <string name="password_not_match">两次输入密码不一致</string>
+    <string name="agreement_required">请阅读并同意协议</string>
+</resources>
