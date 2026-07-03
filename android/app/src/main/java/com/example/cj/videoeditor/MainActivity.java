@@ -1,10 +1,14 @@
 package com.example.cj.videoeditor;
 
+import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import com.example.cj.videoeditor.activity.LoginActivity;
 import com.example.cj.videoeditor.ui.home.HomeFragment;
+import com.example.cj.videoeditor.utils.AppConfig;
+import com.example.cj.videoeditor.utils.SharedPrefUtil;
 import com.example.cj.videoeditor.ui.aicreation.AiCreationFragment;
 import com.example.cj.videoeditor.ui.watermark.WatermarkFragment;
 import com.example.cj.videoeditor.ui.profile.ProfileFragment;
@@ -20,6 +24,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (!SharedPrefUtil.getBoolean(this, AppConfig.SP_LOGIN, false)) {
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+            return;
+        }
         setContentView(R.layout.activity_main);
 
         bottomNavigationView = findViewById(R.id.bottom_navigation);

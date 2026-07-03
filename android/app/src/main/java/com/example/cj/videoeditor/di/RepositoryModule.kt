@@ -1,10 +1,8 @@
 package com.example.cj.videoeditor.di
 
 import com.example.cj.videoeditor.data.repository.DraftRepositoryImpl
-import com.example.cj.videoeditor.data.repository.MediaRepositoryImpl
 import com.example.cj.videoeditor.data.repository.TimelineRepositoryImpl
 import com.example.cj.videoeditor.domain.repository.DraftRepository
-import com.example.cj.videoeditor.domain.repository.MediaRepository
 import com.example.cj.videoeditor.domain.repository.TimelineRepository
 import dagger.Binds
 import dagger.Module
@@ -24,12 +22,6 @@ abstract class RepositoryModule {
     abstract fun bindTimelineRepository(
         impl: TimelineRepositoryImpl
     ): TimelineRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindMediaRepository(
-        impl: MediaRepositoryImpl
-    ): MediaRepository
 
     @Binds
     @Singleton

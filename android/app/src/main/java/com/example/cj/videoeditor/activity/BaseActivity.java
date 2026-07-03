@@ -2,6 +2,7 @@ package com.example.cj.videoeditor.activity;
 
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.LayoutRes;
@@ -19,14 +20,18 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(getLayoutId());
+        setContentView(R.layout.activity_base);
         initTitleBar();
+        ViewGroup container = findViewById(R.id.content_container);
+        if (container != null && getContentLayoutId() != 0) {
+            getLayoutInflater().inflate(getContentLayoutId(), container, true);
+        }
         initViews();
         initData();
     }
 
     @LayoutRes
-    protected abstract int getLayoutId();
+    protected abstract int getContentLayoutId();
 
     protected abstract void initViews();
 

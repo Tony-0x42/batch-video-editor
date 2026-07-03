@@ -12,7 +12,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.example.cj.videoeditor.Constants;
-import com.example.cj.videoeditor.activity.AudioMixActivity;
 import com.example.cj.videoeditor.jni.AudioJniUtils;
 
 import java.io.BufferedOutputStream;

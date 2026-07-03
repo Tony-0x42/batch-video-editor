@@ -52,7 +52,7 @@
 
     <!-- AI去水印 -->
     <string name="watermark_title">AI去水印</string>
-    <string name="link_hint">粘贴短视频分享链接</string>
+    <string name="link_hint">请粘贴短视频平台分享链接</string>
     <string name="parse">解析</string>
     <string name="clear">清空</string>
     <string name="save">保存</string>
@@ -93,4 +93,38 @@
     <string name="password_length_error">密码长度应为6-20位</string>
     <string name="password_not_match">两次输入密码不一致</string>
     <string name="agreement_required">请阅读并同意协议</string>
+
+    <string name="app_slogan">AI 短视频创作助手</string>
+    <string name="login_phone_empty">请输入手机号</string>
+    <string name="login_password_empty">请输入密码</string>
+    <string name="login_success">登录成功</string>
+    <string name="register_success">注册成功</string>
+    <string name="parent_phone_format">上级手机号：%1$s</string>
+    <string name="parent_phone_empty">暂无上级</string>
+    <string name="parent_phone_invalid">渠道二维码已失效，请联系总部管理员重新获取</string>
+    <string name="clear_cache_success">缓存清理成功</string>
+    <string name="version_format">版本号：%1$s</string>
+    <string name="vip_expire_format">有效期至：%1$s</string>
+    <string name="generated_count_format">已生成 %1$d/%2$d 条</string>
+    <string name="clip_progress_format">分镜头 %1$d/%2$d 已生成 %3$d/%4$d</string>
+    <string name="clip_index_format">分镜头 %1$d</string>
+    <string name="split_duration_format">切片时长：%1$.1fs</string>
+    <string name="power_percent_format">%1$.1f%%</string>
+    <string name="power_used_format">已用 %1$d/%2$d GF</string>
+    <string name="service_time">服务时段：%1$s</string>
+    <string name="empty_contact">暂无联系方式，请稍后查看</string>
+    <string name="empty_brand">暂无品牌信息</string>
+    <string name="empty_document">暂无文档</string>
+    <string name="empty_learning">暂无学习资料</string>
+    <string name="parse_empty">请输入分享链接</string>
+    <string name="parse_format_error">链接格式不正确，请检查链接</string>
+    <string name="parse_failed">链接解析失败，请检查链接有效性或更换网络重试</string>
+    <string name="parse_not_support">暂不支持该平台链接解析</string>
+    <string name="save_success">保存成功</string>
+    <string name="save_failed">保存失败，请检查存储权限</string>
+    <string name="nickname_error">昵称长度需在 2-20 个字符之间</string>
+    <string name="save_profile_success">保存成功</string>
+    <string name="dial_failed">拨号失败，请检查设备权限</string>
+    <string name="coming_soon">功能开发中</string>
+    <string name="developer_mode">当前为 Mock 数据模式</string>
 </resources>
