@@ -56,7 +56,7 @@ public class ProfileFragment extends Fragment {
         setupMenu(view, R.id.menu_privacy, getString(R.string.privacy_policy_menu), "", v -> startActivity(new Intent(getContext(), PrivacyActivity.class)));
         setupMenu(view, R.id.menu_clear_cache, getString(R.string.clear_cache), getCacheSize(), v -> clearCache());
         setupMenu(view, R.id.menu_check_update, getString(R.string.check_update), "", v -> ToastUtil.show(getContext(), R.string.coming_soon));
-        setupMenu(view, R.id.menu_version, getString(R.string.check_update), getVersionName(), null);
+        setupMenu(view, R.id.menu_version, getString(R.string.current_version), getVersionName(), null);
 
         btnLogout.setOnClickListener(v -> logout());
 

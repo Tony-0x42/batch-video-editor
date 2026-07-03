@@ -2,8 +2,14 @@ package com.example.cj.videoeditor;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import com.example.cj.videoeditor.activity.LoginActivity;
 import com.example.cj.videoeditor.ui.home.HomeFragment;
@@ -12,58 +18,83 @@ import com.example.cj.videoeditor.utils.SharedPrefUtil;
 import com.example.cj.videoeditor.ui.aicreation.AiCreationFragment;
 import com.example.cj.videoeditor.ui.watermark.WatermarkFragment;
 import com.example.cj.videoeditor.ui.profile.ProfileFragment;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
 public class MainActivity extends AppCompatActivity {
 
-    private BottomNavigationView bottomNavigationView;
+    private LinearLayout bottomNavigation;
     private Fragment currentFragment;
+    private int selectedTab = 0;
+
+    private final int[] navIds = {R.id.nav_home, R.id.nav_ai_creation, R.id.nav_watermark, R.id.nav_profile};
+    private final int[] navIcons = {R.drawable.ic_home, R.drawable.ic_ai_creation, R.drawable.ic_watermark, R.drawable.ic_profile};
+    private final int[] navLabels = {R.string.nav_home, R.string.nav_ai_creation, R.string.nav_watermark, R.string.nav_profile};
+    private final Fragment[] navFragments = {new HomeFragment(), new AiCreationFragment(), new WatermarkFragment(), new ProfileFragment()};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (!SharedPrefUtil.getBoolean(this, AppConfig.SP_LOGIN, false)) {
+        if (!SharedPrefUtil.getBoolean(this, AppConfig.SP_KEY_IS_LOGIN, false)) {
             startActivity(new Intent(this, LoginActivity.class));
             finish();
             return;
         }
         setContentView(R.layout.activity_main);
 
-        bottomNavigationView = findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-            if (itemId == R.id.nav_home) {
-                switchFragment(new HomeFragment());
-                return true;
-            } else if (itemId == R.id.nav_ai_creation) {
-                switchFragment(new AiCreationFragment());
-                return true;
-            } else if (itemId == R.id.nav_watermark) {
-                switchFragment(new WatermarkFragment());
-                return true;
-            } else if (itemId == R.id.nav_profile) {
-                switchFragment(new ProfileFragment());
-                return true;
-            }
-            return false;
-        });
+        bottomNavigation = findViewById(R.id.bottom_navigation);
+        initBottomNavigation();
 
         if (savedInstanceState == null) {
-            bottomNavigationView.setSelectedItemId(R.id.nav_home);
+            switchFragment(0);
         }
     }
 
-    private void switchFragment(@NonNull Fragment fragment) {
-        currentFragment = fragment;
+    private void initBottomNavigation() {
+        LayoutInflater inflater = LayoutInflater.from(this);
+        for (int i = 0; i < navIds.length; i++) {
+            View itemView = inflater.inflate(R.layout.item_bottom_nav, bottomNavigation, false);
+            itemView.setId(navIds[i]);
+            ImageView ivIcon = itemView.findViewById(R.id.iv_icon);
+            TextView tvLabel = itemView.findViewById(R.id.tv_label);
+            ivIcon.setImageResource(navIcons[i]);
+            tvLabel.setText(navLabels[i]);
+            final int index = i;
+            itemView.setOnClickListener(v -> switchFragment(index));
+            bottomNavigation.addView(itemView);
+        }
+        updateSelectedTab(0);
+    }
+
+    private void switchFragment(int index) {
+        selectedTab = index;
+        currentFragment = navFragments[index];
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.fragment_container, fragment)
+                .replace(R.id.fragment_container, currentFragment)
                 .commit();
+        updateSelectedTab(index);
+    }
+
+    private void updateSelectedTab(int index) {
+        int selectedColor = ContextCompat.getColor(this, R.color.colorPrimary);
+        int unselectedColor = ContextCompat.getColor(this, R.color.textSecondary);
+        for (int i = 0; i < bottomNavigation.getChildCount(); i++) {
+            View itemView = bottomNavigation.getChildAt(i);
+            ImageView ivIcon = itemView.findViewById(R.id.iv_icon);
+            TextView tvLabel = itemView.findViewById(R.id.tv_label);
+            boolean selected = i == index;
+            ivIcon.setColorFilter(selected ? selectedColor : unselectedColor);
+            tvLabel.setTextColor(selected ? selectedColor : unselectedColor);
+        }
     }
 
     public void selectTab(int tabId) {
-        bottomNavigationView.setSelectedItemId(tabId);
+        for (int i = 0; i < navIds.length; i++) {
+            if (navIds[i] == tabId) {
+                switchFragment(i);
+                return;
+            }
+        }
     }
 }

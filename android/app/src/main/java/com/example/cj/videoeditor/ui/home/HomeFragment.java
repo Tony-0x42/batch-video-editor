@@ -32,6 +32,7 @@ import java.util.List;
 
 public class HomeFragment extends Fragment {
 
+    private LinearLayout bannerContainer;
     private ViewPager2 viewPagerBanner;
     private LinearLayout indicatorContainer;
     private TextView tvAnnouncementTitle, tvAnnouncementChampion;
@@ -49,6 +50,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        bannerContainer = view.findViewById(R.id.banner_container);
         viewPagerBanner = view.findViewById(R.id.view_pager_banner);
         indicatorContainer = view.findViewById(R.id.indicator_container);
         tvAnnouncementTitle = view.findViewById(R.id.tv_announcement_title);
@@ -64,6 +66,11 @@ public class HomeFragment extends Fragment {
 
     private void loadBanners() {
         banners = MockDataProvider.getBanners();
+        if (banners == null || banners.isEmpty()) {
+            bannerContainer.setVisibility(View.GONE);
+            return;
+        }
+        bannerContainer.setVisibility(View.VISIBLE);
         bannerAdapter = new BannerAdapter(banners);
         viewPagerBanner.setAdapter(bannerAdapter);
         setupIndicator();
@@ -130,6 +137,7 @@ public class HomeFragment extends Fragment {
                     ToastUtil.show(getContext(), R.string.coming_soon);
             }
         });
+        recyclerMenu.setAdapter(adapter);
     }
 
     @Override

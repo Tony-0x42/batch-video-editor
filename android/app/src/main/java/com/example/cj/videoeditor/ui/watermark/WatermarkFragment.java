@@ -1,11 +1,13 @@
 package com.example.cj.videoeditor.ui.watermark;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -35,6 +37,7 @@ public class WatermarkFragment extends Fragment {
     private LinearLayout resultContainer;
     private TextView tabVideo, tabImage, tabText;
     private VideoView videoView;
+    private TextView tvVideoPlaceholder;
     private RecyclerView recyclerImages;
     private ScrollView scrollText;
     private TextView tvText;
@@ -60,17 +63,35 @@ public class WatermarkFragment extends Fragment {
         tabImage = view.findViewById(R.id.tab_image);
         tabText = view.findViewById(R.id.tab_text);
         videoView = view.findViewById(R.id.video_view);
+        tvVideoPlaceholder = view.findViewById(R.id.tv_video_placeholder);
         recyclerImages = view.findViewById(R.id.recycler_images);
         scrollText = view.findViewById(R.id.scroll_text);
         tvText = view.findViewById(R.id.tv_text);
 
         btnClear.setOnClickListener(v -> etLink.setText(""));
         btnParse.setOnClickListener(v -> parse());
-        btnSave.setOnClickListener(v -> save());
+        btnSave.setOnClickListener(v -> {
+            hideKeyboard();
+            save();
+        });
 
-        tabVideo.setOnClickListener(v -> switchTab(0));
-        tabImage.setOnClickListener(v -> switchTab(1));
-        tabText.setOnClickListener(v -> switchTab(2));
+        tabVideo.setOnClickListener(v -> {
+            hideKeyboard();
+            switchTab(0);
+        });
+        tabImage.setOnClickListener(v -> {
+            hideKeyboard();
+            switchTab(1);
+        });
+        tabText.setOnClickListener(v -> {
+            hideKeyboard();
+            switchTab(2);
+        });
+
+        videoView.setOnErrorListener((mp, what, extra) -> {
+            // Mock/placeholder video URL may fail; suppress system error dialog
+            return true;
+        });
     }
 
     private void parse() {
@@ -83,6 +104,7 @@ public class WatermarkFragment extends Fragment {
             ToastUtil.show(getContext(), R.string.parse_format_error);
             return;
         }
+        hideKeyboard();
         progressBar.setVisibility(View.VISIBLE);
         resultContainer.setVisibility(View.GONE);
         btnParse.setEnabled(false);
@@ -108,12 +130,18 @@ public class WatermarkFragment extends Fragment {
         tabVideo.setTextColor(getResources().getColor(tab == 0 ? R.color.colorPrimary : R.color.textSecondary));
         tabImage.setTextColor(getResources().getColor(tab == 1 ? R.color.colorPrimary : R.color.textSecondary));
         tabText.setTextColor(getResources().getColor(tab == 2 ? R.color.colorPrimary : R.color.textSecondary));
-        videoView.setVisibility(tab == 0 ? View.VISIBLE : View.GONE);
+        videoView.setVisibility(View.GONE);
+        tvVideoPlaceholder.setVisibility(tab == 0 ? View.VISIBLE : View.GONE);
         recyclerImages.setVisibility(tab == 1 ? View.VISIBLE : View.GONE);
         scrollText.setVisibility(tab == 2 ? View.VISIBLE : View.GONE);
-        if (tab == 0) {
-            videoView.setVideoPath(result.videoUrl);
-            videoView.start();
+    }
+
+    private void hideKeyboard() {
+        if (etLink == null) return;
+        etLink.clearFocus();
+        InputMethodManager imm = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            imm.hideSoftInputFromWindow(etLink.getWindowToken(), 0);
         }
     }
 
