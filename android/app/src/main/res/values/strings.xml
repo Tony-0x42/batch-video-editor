@@ -118,6 +118,10 @@
     <string name="empty_brand">暂无品牌信息</string>
     <string name="empty_document">暂无文档</string>
     <string name="empty_learning">暂无学习资料</string>
+    <string name="empty_notice">暂无公告</string>
+    <string name="notice_title">公告</string>
+    <string name="notice_load_failed">公告加载失败：%1$s</string>
+    <string name="notice_not_exist">公告不存在</string>
     <string name="parse_empty">请输入分享链接</string>
     <string name="parse_format_error">链接格式不正确，请检查链接</string>
     <string name="parse_failed">链接解析失败，请检查链接有效性或更换网络重试</string>

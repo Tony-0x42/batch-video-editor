@@ -24,6 +24,8 @@ import com.example.cj.videoeditor.activity.BrandActivity;
 import com.example.cj.videoeditor.activity.ContactActivity;
 import com.example.cj.videoeditor.activity.DocumentActivity;
 import com.example.cj.videoeditor.activity.LearningActivity;
+import com.example.cj.videoeditor.activity.NoticeListActivity;
+import com.example.cj.videoeditor.network.dto.BatchAppNoticeDto;
 import com.example.cj.videoeditor.adapter.BannerAdapter;
 import com.example.cj.videoeditor.adapter.HomeMenuAdapter;
 import com.example.cj.videoeditor.bean.Announcement;
@@ -54,6 +56,9 @@ public class HomeFragment extends Fragment {
     private RecyclerView recyclerMenu;
     private ProgressBar progressBar;
     private LinearLayout llTutorial;
+    private LinearLayout llNotice;
+    private TextView tvNoticeTitle;
+    private View viewNoticeDot;
     private ImageView ivTutorialCover;
     private TextView tvTutorialTitle;
     private List<Banner> banners = new ArrayList<>();
@@ -80,10 +85,14 @@ public class HomeFragment extends Fragment {
         llTutorial = view.findViewById(R.id.ll_tutorial);
         ivTutorialCover = view.findViewById(R.id.iv_tutorial_cover);
         tvTutorialTitle = view.findViewById(R.id.tv_tutorial_title);
+        llNotice = view.findViewById(R.id.ll_notice);
+        tvNoticeTitle = view.findViewById(R.id.tv_notice_title);
+        viewNoticeDot = view.findViewById(R.id.view_notice_dot);
 
         loadBanners();
         loadAnnouncement();
         loadMenus();
+        loadNoticeEntry();
         loadTutorialEntry();
         startAutoScroll();
     }
@@ -204,6 +213,32 @@ public class HomeFragment extends Fragment {
             public void onError(String msg) {
                 finishRequest();
                 ToastUtil.show(getContext(), msg);
+            }
+        });
+    }
+
+    private void loadNoticeEntry() {
+        startRequest();
+        apiService.getNoticeList().enqueue(new PageApiCallback<BatchAppNoticeDto>() {
+            @Override
+            public void onSuccess(long total, List<BatchAppNoticeDto> rows) {
+                finishRequest();
+                if (rows == null || rows.isEmpty()) {
+                    llNotice.setVisibility(View.GONE);
+                    return;
+                }
+                BatchAppNoticeDto dto = rows.get(0);
+                String title = dto.getNoticeTitle() != null ? dto.getNoticeTitle() : "";
+                tvNoticeTitle.setText(title);
+                viewNoticeDot.setVisibility(View.VISIBLE);
+                llNotice.setOnClickListener(v -> startActivity(new Intent(getContext(), NoticeListActivity.class)));
+                llNotice.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onError(String msg) {
+                finishRequest();
+                llNotice.setVisibility(View.GONE);
             }
         });
     }
