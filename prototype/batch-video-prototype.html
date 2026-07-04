@@ -1169,10 +1169,6 @@
             <span>🏠</span>
             <span class="text-sm font-medium">首页内容管理</span>
           </div>
-          <div onclick="switchAdminPage('admin-notice')" class="admin-menu-item flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer hover:bg-gray-50 text-gray-700">
-            <span>📢</span>
-            <span class="text-sm font-medium">公告管理</span>
-          </div>
           <div onclick="switchAdminPage('admin-course')" class="admin-menu-item flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer hover:bg-gray-50 text-gray-700">
             <span>📚</span>
             <span class="text-sm font-medium">教程管理</span>
@@ -1736,66 +1732,6 @@
                 <button onclick="showToast('教程入口配置保存成功')" class="bg-primary text-white px-6 py-2 rounded-lg text-sm">保存教程入口</button>
               </div>
             </div>
-          </div>
-        </div>
-
-        <!-- 公告管理 -->
-        <div id="admin-notice" class="admin-content">
-          <div class="bg-white rounded-xl shadow-sm p-6">
-            <div class="flex justify-between items-center mb-6">
-              <h2 class="text-xl font-bold text-gray-800">公告管理</h2>
-              <button class="bg-primary text-white px-4 py-2 rounded-lg text-sm">+ 新增公告</button>
-            </div>
-            <div class="flex gap-3 mb-4">
-              <input type="text" placeholder="公告标题" class="border border-gray-300 rounded-lg px-3 py-2 text-sm w-64 focus:border-primary focus:outline-none">
-              <select class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary focus:outline-none">
-                <option>全部状态</option>
-                <option>已发布</option>
-                <option>已下架</option>
-              </select>
-              <button class="bg-primary text-white px-4 py-2 rounded-lg text-sm">搜索</button>
-            </div>
-            <table class="w-full text-sm">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th class="px-4 py-3 text-left text-gray-600 font-medium">公告标题</th>
-                  <th class="px-4 py-3 text-left text-gray-600 font-medium">公告类型</th>
-                  <th class="px-4 py-3 text-left text-gray-600 font-medium">发布人</th>
-                  <th class="px-4 py-3 text-left text-gray-600 font-medium">发布时间</th>
-                  <th class="px-4 py-3 text-left text-gray-600 font-medium">状态</th>
-                  <th class="px-4 py-3 text-left text-gray-600 font-medium">阅读量</th>
-                  <th class="px-4 py-3 text-left text-gray-600 font-medium">操作</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-gray-100">
-                <tr class="hover:bg-gray-50">
-                  <td class="px-4 py-3">系统维护通知</td>
-                  <td class="px-4 py-3">通知</td>
-                  <td class="px-4 py-3">管理员</td>
-                  <td class="px-4 py-3">2026-07-01 10:00</td>
-                  <td class="px-4 py-3"><span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">已发布</span></td>
-                  <td class="px-4 py-3">1,234</td>
-                  <td class="px-4 py-3">
-                    <button class="text-primary text-sm mr-2">查看</button>
-                    <button class="text-primary text-sm mr-2">编辑</button>
-                    <button class="text-red-500 text-sm">删除</button>
-                  </td>
-                </tr>
-                <tr class="hover:bg-gray-50">
-                  <td class="px-4 py-3">新功能上线活动</td>
-                  <td class="px-4 py-3">活动</td>
-                  <td class="px-4 py-3">管理员</td>
-                  <td class="px-4 py-3">2026-06-28 14:30</td>
-                  <td class="px-4 py-3"><span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">已发布</span></td>
-                  <td class="px-4 py-3">2,567</td>
-                  <td class="px-4 py-3">
-                    <button class="text-primary text-sm mr-2">查看</button>
-                    <button class="text-primary text-sm mr-2">编辑</button>
-                    <button class="text-red-500 text-sm">删除</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
           </div>
         </div>
 
@@ -2791,7 +2727,7 @@
       });
       const menuMap = {
         'admin-dashboard': 0, 'admin-customer': 1, 'admin-customer-add': 1, 'admin-customer-detail': 1,
-        'admin-vip': 2, 'admin-home-config': 3, 'admin-notice': 4, 'admin-course': 5, 'admin-doc': 6, 'admin-system': 7
+        'admin-vip': 2, 'admin-home-config': 3, 'admin-course': 4, 'admin-doc': 5, 'admin-system': 6
       };
       const menuItems = document.querySelectorAll('.admin-menu-item');
       if (menuMap[pageId] !== undefined) {
@@ -2897,7 +2833,6 @@
         <div class="nav-item" onclick="showPageFromNav('admin','admin-customer-detail')">账号详情</div>
         <div class="nav-item" onclick="showPageFromNav('admin','admin-vip')">会员VIP管理</div>
         <div class="nav-item" onclick="showPageFromNav('admin','admin-home-config')">首页内容管理</div>
-        <div class="nav-item" onclick="showPageFromNav('admin','admin-notice')">公告管理</div>
         <div class="nav-item" onclick="showPageFromNav('admin','admin-course')">教程管理</div>
         <div class="nav-item" onclick="showPageFromNav('admin','admin-doc')">文档管理</div>
         <div class="nav-item" onclick="showPageFromNav('admin','admin-system')">系统配置</div>
