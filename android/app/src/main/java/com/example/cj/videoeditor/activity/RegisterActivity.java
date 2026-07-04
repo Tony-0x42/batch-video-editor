@@ -22,6 +22,7 @@ import com.example.cj.videoeditor.network.AuthApiCallback;
 import com.example.cj.videoeditor.network.dto.AppRegisterBody;
 import com.example.cj.videoeditor.network.dto.BatchCustomerDto;
 import com.example.cj.videoeditor.network.util.TokenManager;
+import com.example.cj.videoeditor.utils.AppConfig;
 import com.example.cj.videoeditor.utils.ToastUtil;
 import com.example.cj.videoeditor.utils.UserSession;
 import com.google.android.material.button.MaterialButton;
@@ -100,6 +101,8 @@ public class RegisterActivity extends BaseActivity {
             ivToggleConfirmPwd.setImageResource(confirmPwdVisible ? R.drawable.ic_visibility : R.drawable.ic_visibility_off);
             etConfirmPassword.setSelection(etConfirmPassword.length());
         });
+
+        AppConfig.loadGlobalConfig(this, apiService);
 
         btnRegister.setOnClickListener(v -> attemptRegister());
         tvGoLogin.setOnClickListener(v -> finish());

@@ -133,7 +133,7 @@ public class WatermarkFragment extends Fragment {
                 progressBar.setVisibility(View.GONE);
                 btnParse.setEnabled(true);
                 if (data == null) {
-                    ToastUtil.show(getContext(), R.string.parse_failed);
+                    ToastUtil.show(getContext(), AppConfig.getParseFailTip(requireContext()));
                     return;
                 }
                 result = toParseResult(data);
@@ -148,7 +148,7 @@ public class WatermarkFragment extends Fragment {
                 }
                 progressBar.setVisibility(View.GONE);
                 btnParse.setEnabled(true);
-                ToastUtil.show(getContext(), msg != null ? msg : getString(R.string.parse_failed));
+                ToastUtil.show(getContext(), msg != null ? msg : AppConfig.getParseFailTip(requireContext()));
             }
         });
     }
@@ -195,7 +195,7 @@ public class WatermarkFragment extends Fragment {
         int used = SharedPrefUtil.getInt(requireContext(), AppConfig.SP_KEY_COMPUTE_USED, 0);
         if (used >= total) {
             new AlertDialog.Builder(requireContext())
-                    .setMessage(R.string.power_exhausted)
+                    .setMessage(AppConfig.getPowerExhaustedMessage(requireContext()))
                     .setPositiveButton(R.string.confirm, null)
                     .show();
             return;
@@ -223,7 +223,7 @@ public class WatermarkFragment extends Fragment {
                         }
                         btnSave.setEnabled(true);
                         new AlertDialog.Builder(requireContext())
-                                .setMessage(msg != null ? msg : getString(R.string.power_exhausted))
+                                .setMessage(msg != null ? msg : AppConfig.getPowerExhaustedMessage(requireContext()))
                                 .setPositiveButton(R.string.confirm, null)
                                 .show();
                     }

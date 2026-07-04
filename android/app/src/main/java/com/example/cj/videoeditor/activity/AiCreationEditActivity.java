@@ -82,16 +82,17 @@ public class AiCreationEditActivity extends BaseActivity {
         if (groupId != null && groupId > 0) {
             loadGroupDetail(groupId);
         } else {
-            clipList.add(new VideoClip(String.valueOf(System.currentTimeMillis()), "", "分镜头 1", 2.0));
+            clipList.add(new VideoClip(String.valueOf(System.currentTimeMillis()), "", "分镜头 1", AppConfig.getDefaultSliceDuration(this)));
             adapter.notifyDataSetChanged();
         }
 
         btnAddClip.setOnClickListener(v -> {
-            if (clipList.size() >= 10) {
-                ToastUtil.show(this, "最多 10 个分镜头");
+            int maxClips = AppConfig.getMaxVideos(this);
+            if (clipList.size() >= maxClips) {
+                ToastUtil.show(this, String.format(Locale.getDefault(), "最多 %d 个分镜头", maxClips));
                 return;
             }
-            clipList.add(new VideoClip(String.valueOf(System.currentTimeMillis()), "", "分镜头 " + (clipList.size() + 1), 2.0));
+            clipList.add(new VideoClip(String.valueOf(System.currentTimeMillis()), "", "分镜头 " + (clipList.size() + 1), AppConfig.getDefaultSliceDuration(this)));
             adapter.notifyDataSetChanged();
         });
 
@@ -138,7 +139,7 @@ public class AiCreationEditActivity extends BaseActivity {
 
     private void addDefaultClip() {
         if (clipList.isEmpty()) {
-            clipList.add(new VideoClip(String.valueOf(System.currentTimeMillis()), "", "分镜头 1", 2.0));
+            clipList.add(new VideoClip(String.valueOf(System.currentTimeMillis()), "", "分镜头 1", AppConfig.getDefaultSliceDuration(this)));
         }
     }
 
@@ -147,7 +148,7 @@ public class AiCreationEditActivity extends BaseActivity {
         int used = SharedPrefUtil.getInt(this, AppConfig.SP_KEY_COMPUTE_USED, 0);
         if (used >= total) {
             new AlertDialog.Builder(this)
-                    .setMessage(R.string.power_exhausted)
+                    .setMessage(AppConfig.getPowerExhaustedMessage(this))
                     .setPositiveButton(R.string.confirm, null)
                     .show();
             return;

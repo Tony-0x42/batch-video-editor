@@ -11,6 +11,7 @@ import com.example.cj.videoeditor.R;
 import com.example.cj.videoeditor.network.ApiCallback;
 import com.example.cj.videoeditor.network.ApiService;
 import com.example.cj.videoeditor.network.dto.BatchContactDto;
+import com.example.cj.videoeditor.utils.AppConfig;
 import com.example.cj.videoeditor.utils.ToastUtil;
 
 import java.util.List;
@@ -58,15 +59,14 @@ public class CustomerServiceActivity extends BaseActivity {
         apiService.getGlobalConfig().enqueue(new ApiCallback<Map<String, Object>>() {
             @Override
             public void onSuccess(Map<String, Object> data) {
-                if (data != null) {
-                    Object hours = data.get("customerServiceHours");
-                    serviceHours = hours != null ? String.valueOf(hours) : "";
-                }
+                AppConfig.saveGlobalConfig(CustomerServiceActivity.this, data);
+                serviceHours = AppConfig.getCustomerServiceHours(CustomerServiceActivity.this);
                 onDataLoaded();
             }
 
             @Override
             public void onError(String msg) {
+                serviceHours = AppConfig.getCustomerServiceHours(CustomerServiceActivity.this);
                 onDataLoaded();
             }
         });

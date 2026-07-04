@@ -12,6 +12,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import com.example.cj.videoeditor.activity.LoginActivity;
+
+import javax.inject.Inject;
+import com.example.cj.videoeditor.network.ApiService;
 import com.example.cj.videoeditor.ui.home.HomeFragment;
 import com.example.cj.videoeditor.utils.AppConfig;
 import com.example.cj.videoeditor.utils.SharedPrefUtil;
@@ -23,6 +26,9 @@ import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
 public class MainActivity extends AppCompatActivity {
+
+    @Inject
+    ApiService apiService;
 
     private LinearLayout bottomNavigation;
     private Fragment currentFragment;
@@ -46,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
 
         bottomNavigation = findViewById(R.id.bottom_navigation);
         initBottomNavigation();
+        AppConfig.loadGlobalConfig(this, apiService);
 
         if (savedInstanceState == null) {
             switchFragment(0);

@@ -203,7 +203,7 @@ public class AiCreationFragment extends Fragment {
         Long groupId = dto.getGroupId() != null ? dto.getGroupId() : 0L;
         String name = dto.getGroupName() != null ? dto.getGroupName() : "";
         int generated = dto.getGeneratedCount() != null ? dto.getGeneratedCount() : 0;
-        int maxLimit = dto.getMaxLimit() != null ? dto.getMaxLimit() : 10;
+        int maxLimit = dto.getMaxLimit() != null ? dto.getMaxLimit() : AppConfig.getMaxVideos(requireContext());
         return new VideoGroup(String.valueOf(groupId), name, date, generated, maxLimit);
     }
 
@@ -265,7 +265,7 @@ public class AiCreationFragment extends Fragment {
         int used = SharedPrefUtil.getInt(requireContext(), AppConfig.SP_KEY_COMPUTE_USED, 0);
         if (used >= total) {
             new AlertDialog.Builder(requireContext())
-                    .setMessage(R.string.power_exhausted)
+                    .setMessage(AppConfig.getPowerExhaustedMessage(requireContext()))
                     .setPositiveButton(R.string.confirm, null)
                     .show();
             return;
@@ -281,7 +281,7 @@ public class AiCreationFragment extends Fragment {
                 Long groupId = data != null && data.getGroupId() != null ? data.getGroupId() : 0L;
                 String date = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
                         .format(new java.util.Date());
-                VideoGroup group = new VideoGroup(String.valueOf(groupId), dto.getGroupName(), date, 0, 10);
+                VideoGroup group = new VideoGroup(String.valueOf(groupId), dto.getGroupName(), date, 0, AppConfig.getMaxVideos(requireContext()));
                 allGroups.add(0, group);
                 filter(etSearch.getText().toString());
                 ToastUtil.show(getContext(), R.string.add_group);
