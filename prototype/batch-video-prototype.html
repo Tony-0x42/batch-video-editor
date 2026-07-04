@@ -294,13 +294,8 @@
           </div>
 
           <!-- 喜报 -->
-          <div class="mx-4 mb-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl p-4 border border-amber-100">
-            <p class="text-sm font-medium text-amber-800 mb-2">🎉 恭喜华东区超额完成 Q2 目标！</p>
-            <div class="flex items-baseline gap-2">
-              <span class="text-gray-600 text-sm">销售冠军</span>
-              <span class="font-bold text-gray-800">王小明</span>
-              <span class="text-primary text-xl font-bold">¥586,000</span>
-            </div>
+          <div id="homeReportsContainer" class="mx-4 mb-4 overflow-x-auto hide-scrollbar">
+            <!-- JS renders -->
           </div>
 
           <!-- 功能导航 -->
@@ -1613,35 +1608,15 @@
             <!-- 喜报数据管理 -->
             <div id="home-tab-report" class="home-tab-content hidden max-w-2xl space-y-6">
               <div class="bg-amber-50 rounded-xl p-4 border border-amber-100">
-                <h3 class="font-bold text-amber-800 text-sm mb-1">首页喜报预览</h3>
-                <p class="text-xs text-gray-600">配置后将同步展示在 APP 首页喜报区域</p>
+                <h3 class="font-bold text-amber-800 text-sm mb-1">首页喜报配置</h3>
+                <p class="text-xs text-gray-600">配置多条喜报，APP 首页将横向滚动展示；无喜报时首页不展示该区域。</p>
               </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">喜报标题</label>
-                <input type="text" value="🎉 恭喜华东区超额完成 Q2 目标！" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary focus:outline-none">
+              <div id="homeReportConfigList" class="space-y-4">
+                <!-- JS renders -->
               </div>
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">销售冠军姓名</label>
-                  <input type="text" value="王小明" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary focus:outline-none">
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">业绩金额</label>
-                  <input type="text" value="586000" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary focus:outline-none">
-                </div>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">标签文字</label>
-                <input type="text" value="销售冠军" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary focus:outline-none">
-              </div>
-              <div>
-                <label class="flex items-center gap-2 text-sm text-gray-700">
-                  <input type="checkbox" checked class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary">
-                  在首页展示喜报
-                </label>
-              </div>
-              <div class="pt-4">
-                <button onclick="showToast('喜报数据保存成功')" class="bg-primary text-white px-6 py-2 rounded-lg text-sm">保存喜报配置</button>
+              <button onclick="addHomeReport()" class="text-sm text-primary border border-primary px-4 py-2 rounded-lg">+ 新增喜报</button>
+              <div class="pt-2">
+                <button onclick="saveHomeReports()" class="bg-primary text-white px-6 py-2 rounded-lg text-sm">保存喜报配置</button>
               </div>
             </div>
 
@@ -2273,6 +2248,10 @@
       if (pageId === 'page-aicloud-progress') {
         setTimeout(simulateSplitProgress, 100);
       }
+      // 进入首页时渲染喜报
+      if (pageId === 'page-home') {
+        renderHomeReports();
+      }
     }
 
     function goBack() {
@@ -2577,6 +2556,7 @@
       });
       document.querySelectorAll('.home-tab-content').forEach(c => c.classList.add('hidden'));
       document.getElementById('home-tab-' + tabName).classList.remove('hidden');
+      if (tabName === 'report') renderHomeReportConfig();
     }
 
     // 渲染联系方式 - 各地经销负责人列表
@@ -2708,6 +2688,93 @@
       closeDocModal();
       renderAdminDocs();
       showToast('文档新增成功');
+    }
+
+    // 首页喜报数据
+    let appHomeReports = [
+      { id: 1, title: '🎉 恭喜华东区超额完成 Q2 目标！', label: '销售冠军', name: '王小明', amount: '586,000' },
+      { id: 2, title: '🎉 华南区 6 月业绩再创新高！', label: '销售冠军', name: '李建国', amount: '432,000' },
+      { id: 3, title: '🎉 西南区团队达成月度目标！', label: '销售冠军', name: '赵敏', amount: '378,000' }
+    ];
+
+    function formatAmount(value) {
+      const num = value.replace(/,/g, '').replace(/\D/g, '');
+      return num ? Number(num).toLocaleString('en-US') : '';
+    }
+
+    function renderHomeReports() {
+      const container = document.getElementById('homeReportsContainer');
+      if (!container) return;
+      if (appHomeReports.length === 0) {
+        container.style.display = 'none';
+        return;
+      }
+      container.style.display = 'block';
+      container.innerHTML = `
+        <div class="flex gap-3" style="width: max-content;">
+          ${appHomeReports.map(report => `
+            <div class="bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl p-4 border border-amber-100" style="min-width: 280px; max-width: 320px;">
+              <p class="text-sm font-medium text-amber-800 mb-2">${report.title}</p>
+              <div class="flex items-baseline gap-2 flex-wrap">
+                <span class="text-gray-600 text-sm">${report.label}</span>
+                <span class="font-bold text-gray-800">${report.name}</span>
+                <span class="text-primary text-xl font-bold">¥${report.amount}</span>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function renderHomeReportConfig() {
+      const container = document.getElementById('homeReportConfigList');
+      if (!container) return;
+      if (appHomeReports.length === 0) {
+        container.innerHTML = '<p class="text-sm text-gray-400">暂无喜报，点击“新增喜报”添加。</p>';
+        return;
+      }
+      container.innerHTML = appHomeReports.map((report, index) => `
+        <div class="bg-gray-50 rounded-xl p-4 space-y-3">
+          <div class="flex justify-between items-center">
+            <span class="text-sm font-medium text-gray-700">喜报 #${index + 1}</span>
+            <button onclick="deleteHomeReport(${index})" class="text-red-500 text-sm hover:underline">删除</button>
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">喜报标题</label>
+            <input type="text" value="${report.title}" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary focus:outline-none" onchange="appHomeReports[${index}].title = this.value">
+          </div>
+          <div class="grid grid-cols-3 gap-3">
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">标签</label>
+              <input type="text" value="${report.label}" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary focus:outline-none" onchange="appHomeReports[${index}].label = this.value">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">姓名</label>
+              <input type="text" value="${report.name}" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary focus:outline-none" onchange="appHomeReports[${index}].name = this.value">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">金额</label>
+              <input type="text" value="${report.amount}" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary focus:outline-none" onchange="appHomeReports[${index}].amount = formatAmount(this.value); this.value = appHomeReports[${index}].amount">
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function addHomeReport() {
+      const newId = appHomeReports.length > 0 ? Math.max(...appHomeReports.map(r => r.id)) + 1 : 1;
+      appHomeReports.push({ id: newId, title: '🎉 喜报标题', label: '销售冠军', name: '', amount: '' });
+      renderHomeReportConfig();
+    }
+
+    function deleteHomeReport(index) {
+      appHomeReports.splice(index, 1);
+      renderHomeReportConfig();
+    }
+
+    function saveHomeReports() {
+      renderHomeReports();
+      showToast('喜报数据保存成功');
     }
 
     // 保存全局参数（分镜头配置等）
