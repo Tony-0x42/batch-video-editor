@@ -85,11 +85,21 @@
 
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/tv_drag_hint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginTop="4dp"
+        android:text="@string/drag_to_sort"
+        android:textColor="@color/textSecondary"
+        android:textSize="12sp" />
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_marginTop="12dp">
+        android:layout_marginTop="4dp">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_groups"

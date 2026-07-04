@@ -37,6 +37,7 @@
 
     <!-- AI云创 -->
     <string name="ai_creation_title">AI云创</string>
+    <string name="drag_to_sort">长按拖动排序</string>
     <string name="compute_power">算力</string>
     <string name="total_compute_power">总算力: %1$d</string>
     <string name="used_compute_power">已用: %1$d</string>

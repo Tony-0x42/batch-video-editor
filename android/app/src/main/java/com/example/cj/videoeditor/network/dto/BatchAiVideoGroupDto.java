@@ -30,6 +30,9 @@ public class BatchAiVideoGroupDto {
     @SerializedName("createTime")
     private String createTime;
 
+    @SerializedName("sortWeight")
+    private Integer sortWeight;
+
     @SerializedName("clips")
     private List<BatchAiVideoClipDto> clips;
 
@@ -90,6 +93,14 @@ public class BatchAiVideoGroupDto {
 
     public void setCreateTime(String createTime) {
         this.createTime = createTime;
+    }
+
+    public Integer getSortWeight() {
+        return sortWeight;
+    }
+
+    public void setSortWeight(Integer sortWeight) {
+        this.sortWeight = sortWeight;
     }
 
     public List<BatchAiVideoClipDto> getClips() {

@@ -17,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -49,13 +50,14 @@ public class AiCreationFragment extends Fragment {
     ApiService apiService;
 
     private EditText etSearch;
-    private TextView tvPowerPercent, tvUsedPower, tvTotalPower;
+    private TextView tvPowerPercent, tvUsedPower, tvTotalPower, tvDragHint;
     private ProgressBar powerProgress;
     private RecyclerView recyclerGroups;
     private LinearLayout emptyView;
     private Button btnAddGroup, btnEmptyAdd;
     private ProgressBar loadingProgress;
     private VideoGroupAdapter adapter;
+    private ItemTouchHelper itemTouchHelper;
     private List<VideoGroup> allGroups = new ArrayList<>();
     private List<VideoGroup> displayGroups = new ArrayList<>();
 
@@ -78,6 +80,7 @@ public class AiCreationFragment extends Fragment {
         btnAddGroup = view.findViewById(R.id.btn_add_group);
         btnEmptyAdd = view.findViewById(R.id.btn_empty_add);
         loadingProgress = view.findViewById(R.id.loading_progress);
+        tvDragHint = view.findViewById(R.id.tv_drag_hint);
 
         loadPower();
         setupRecyclerView();
@@ -110,7 +113,7 @@ public class AiCreationFragment extends Fragment {
         recyclerGroups.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new VideoGroupAdapter(displayGroups);
         recyclerGroups.setAdapter(adapter);
-        adapter.setOnGroupActionListener(new VideoGroupAdapter.OnGroupActionListener() {
+        final VideoGroupAdapter.OnGroupActionListener actionListener = new VideoGroupAdapter.OnGroupActionListener() {
             @Override
             public void onGroupClick(VideoGroup group) {
                 Intent intent = new Intent(getContext(), AiCreationEditActivity.class);
@@ -132,7 +135,69 @@ public class AiCreationFragment extends Fragment {
                         .setNegativeButton(R.string.cancel, null)
                         .show();
             }
-        });
+
+            @Override
+            public void onGroupMoved(int fromPosition, int toPosition) {
+                onGroupDragged(fromPosition, toPosition);
+            }
+        };
+        adapter.setOnGroupActionListener(actionListener);
+
+        ItemTouchHelper.SimpleCallback callback = new ItemTouchHelper.SimpleCallback(
+                ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0) {
+            private int dragFromPosition = -1;
+            private int dragToPosition = -1;
+
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView,
+                                  @NonNull RecyclerView.ViewHolder viewHolder,
+                                  @NonNull RecyclerView.ViewHolder target) {
+                int from = viewHolder.getBindingAdapterPosition();
+                int to = target.getBindingAdapterPosition();
+                if (dragFromPosition == -1) {
+                    dragFromPosition = from;
+                }
+                dragToPosition = to;
+                return adapter.moveItem(from, to);
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+            }
+
+            @Override
+            public boolean isLongPressDragEnabled() {
+                return false;
+            }
+
+            @Override
+            public void onSelectedChanged(@Nullable RecyclerView.ViewHolder viewHolder, int actionState) {
+                super.onSelectedChanged(viewHolder, actionState);
+                if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
+                    if (adapter != null) {
+                        adapter.setDragEnabled(false);
+                    }
+                }
+            }
+
+            @Override
+            public void clearView(@NonNull RecyclerView recyclerView,
+                                  @NonNull RecyclerView.ViewHolder viewHolder) {
+                super.clearView(recyclerView, viewHolder);
+                if (adapter != null) {
+                    adapter.setDragEnabled(true);
+                }
+                if (dragFromPosition != -1 && dragToPosition != -1
+                        && dragFromPosition != dragToPosition) {
+                    actionListener.onGroupMoved(dragFromPosition, dragToPosition);
+                }
+                dragFromPosition = -1;
+                dragToPosition = -1;
+            }
+        };
+        itemTouchHelper = new ItemTouchHelper(callback);
+        itemTouchHelper.attachToRecyclerView(recyclerGroups);
+        adapter.setItemTouchHelper(itemTouchHelper);
     }
 
     private void loadPower() {
@@ -181,6 +246,7 @@ public class AiCreationFragment extends Fragment {
                 for (BatchAiVideoGroupDto dto : rows) {
                     allGroups.add(mapToVideoGroup(dto));
                 }
+                allGroups.sort((a, b) -> Integer.compare(a.getSortWeight(), b.getSortWeight()));
                 filter(etSearch.getText().toString());
             }
 
@@ -204,7 +270,8 @@ public class AiCreationFragment extends Fragment {
         String name = dto.getGroupName() != null ? dto.getGroupName() : "";
         int generated = dto.getGeneratedCount() != null ? dto.getGeneratedCount() : 0;
         int maxLimit = dto.getMaxLimit() != null ? dto.getMaxLimit() : AppConfig.getMaxVideos(requireContext());
-        return new VideoGroup(String.valueOf(groupId), name, date, generated, maxLimit);
+        int sortWeight = dto.getSortWeight() != null ? dto.getSortWeight() : 0;
+        return new VideoGroup(String.valueOf(groupId), name, date, generated, maxLimit, sortWeight);
     }
 
     private void deleteGroup(VideoGroup group) {
@@ -237,19 +304,65 @@ public class AiCreationFragment extends Fragment {
         }
     }
 
+    private void onGroupDragged(int fromPosition, int toPosition) {
+        if (fromPosition == toPosition) {
+            return;
+        }
+        int start = Math.min(fromPosition, toPosition);
+        int end = Math.max(fromPosition, toPosition);
+        for (int i = start; i <= end; i++) {
+            VideoGroup group = displayGroups.get(i);
+            group.setSortWeight(i);
+            int allIndex = allGroups.indexOf(group);
+            if (allIndex >= 0) {
+                allGroups.get(allIndex).setSortWeight(i);
+            }
+        }
+        for (int i = start; i <= end; i++) {
+            updateGroupSortWeight(displayGroups.get(i), i);
+        }
+    }
+
+    private void updateGroupSortWeight(VideoGroup group, int sortWeight) {
+        try {
+            long groupId = Long.parseLong(group.id);
+            BatchAiVideoGroupDto dto = new BatchAiVideoGroupDto();
+            dto.setGroupId(groupId);
+            dto.setGroupName(group.name);
+            dto.setSortWeight(sortWeight);
+            apiService.updateAiVideoGroup(dto).enqueue(new ApiCallback<Object>() {
+                @Override
+                public void onSuccess(Object data) {
+                }
+
+                @Override
+                public void onError(String msg) {
+                    ToastUtil.show(requireContext(), msg);
+                }
+            });
+        } catch (NumberFormatException e) {
+            ToastUtil.show(requireContext(), "视频组 ID 异常");
+        }
+    }
+
     private void filter(String keyword) {
         displayGroups.clear();
-        if (keyword == null || keyword.trim().isEmpty()) {
-            displayGroups.addAll(allGroups);
-        } else {
+        boolean searching = keyword != null && !keyword.trim().isEmpty();
+        if (searching) {
             for (VideoGroup g : allGroups) {
                 if (g.name != null && g.name.contains(keyword.trim())) {
                     displayGroups.add(g);
                 }
             }
+        } else {
+            displayGroups.addAll(allGroups);
         }
         if (adapter != null) {
+            adapter.setDragEnabled(!searching);
             adapter.notifyDataSetChanged();
+        }
+        if (tvDragHint != null) {
+            tvDragHint.setVisibility(searching ? View.GONE : View.VISIBLE);
         }
         updateEmptyView();
     }
@@ -281,7 +394,7 @@ public class AiCreationFragment extends Fragment {
                 Long groupId = data != null && data.getGroupId() != null ? data.getGroupId() : 0L;
                 String date = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
                         .format(new java.util.Date());
-                VideoGroup group = new VideoGroup(String.valueOf(groupId), dto.getGroupName(), date, 0, AppConfig.getMaxVideos(requireContext()));
+                VideoGroup group = new VideoGroup(String.valueOf(groupId), dto.getGroupName(), date, 0, AppConfig.getMaxVideos(requireContext()), 0);
                 allGroups.add(0, group);
                 filter(etSearch.getText().toString());
                 ToastUtil.show(getContext(), R.string.add_group);
