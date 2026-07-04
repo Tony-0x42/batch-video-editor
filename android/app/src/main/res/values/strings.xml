@@ -91,6 +91,8 @@
     <string name="confirm_delete">确认删除？</string>
     <string name="confirm_logout">确认退出登录？</string>
     <string name="confirm_delete_account">注销账号将清除全部数据，确认继续？</string>
+    <string name="delete_account_warning_title">注销账号</string>
+    <string name="delete_account_warning_message">账号注销后不可恢复。若该账号存在下级账号，注销将失败，请先迁移或清空下级账号。</string>
     <string name="phone_format_error">手机号格式错误</string>
     <string name="password_length_error">密码长度应为6-20位</string>
     <string name="password_not_match">两次输入密码不一致</string>

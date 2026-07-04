@@ -172,10 +172,27 @@ public class ProfileFragment extends Fragment {
 
     private void confirmDeleteAccount() {
         new AlertDialog.Builder(requireContext())
-                .setTitle(R.string.confirm_delete_account)
-                .setPositiveButton(R.string.confirm, (dialog, which) -> doLocalLogout())
+                .setTitle(R.string.delete_account_warning_title)
+                .setMessage(R.string.delete_account_warning_message)
+                .setPositiveButton(R.string.confirm, (dialog, which) -> deleteAccount())
                 .setNegativeButton(R.string.cancel, null)
                 .show();
+    }
+
+    private void deleteAccount() {
+        showLoading(true);
+        apiService.deleteCurrentCustomer().enqueue(new ApiCallback<Object>() {
+            @Override
+            public void onSuccess(Object data) {
+                doLocalLogout();
+            }
+
+            @Override
+            public void onError(String msg) {
+                showLoading(false);
+                ToastUtil.show(getContext(), msg);
+            }
+        });
     }
 
     private void showLoading(boolean show) {
