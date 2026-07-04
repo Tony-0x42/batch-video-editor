@@ -580,13 +580,22 @@
             </label>
           </div>
           <!-- AI 视频分割 / 查看进度 -->
-          <div class="bg-white px-4 py-3 border-b border-gray-100 flex gap-3">
-            <button onclick="navigateTo('page-aicloud-progress')" class="flex-1 bg-orange-50 text-orange-500 py-2.5 rounded-lg text-sm font-medium flex items-center justify-center gap-2">
-              <span>🎬</span> AI视频分割
-            </button>
-            <button onclick="navigateTo('page-aicloud-progress')" class="flex-1 bg-gray-50 text-gray-600 py-2.5 rounded-lg text-sm font-medium">
-              查看进度
-            </button>
+          <div class="bg-white border-b border-gray-100">
+            <div class="px-4 py-3.5 flex items-center justify-between cursor-pointer" onclick="navigateTo('page-aicloud-split')">
+              <div class="flex items-center gap-3">
+                <span class="text-xl">🎬</span>
+                <span class="text-sm font-medium text-gray-800">AI 视频分割</span>
+              </div>
+              <span class="text-gray-400">→</span>
+            </div>
+            <div class="border-t border-gray-100"></div>
+            <div class="px-4 py-3.5 flex items-center justify-between cursor-pointer" onclick="navigateTo('page-aicloud-progress')">
+              <div class="flex items-center gap-3">
+                <span class="text-xl">⏱️</span>
+                <span class="text-sm font-medium text-gray-800">查看进度</span>
+              </div>
+              <span class="text-gray-400">→</span>
+            </div>
           </div>
           <!-- 分镜头统计 -->
           <div class="bg-white px-4 py-3 border-b border-gray-100 flex justify-between items-center">
@@ -726,6 +735,36 @@
 
           <p class="text-xs text-gray-500 text-center mt-6">切分完成后将自动返回编辑页<br>您可以将 APP 切换至后台</p>
           <button onclick="goBack()" class="mt-4 w-full text-primary text-sm py-3 bg-white rounded-xl shadow-sm">返回编辑页</button>
+        </div>
+      </div>
+
+      <!-- AI 视频分割 -->
+      <div id="page-aicloud-split" class="page bg-gray-50">
+        <div class="h-12 bg-white flex items-center px-4 border-b border-gray-100">
+          <span class="text-xl cursor-pointer" onclick="goBack()">←</span>
+          <span class="flex-1 text-center font-medium">AI 视频分割</span>
+          <span class="w-6"></span>
+        </div>
+        <div class="flex-1 overflow-y-auto hide-scrollbar p-4 pb-20">
+          <div class="bg-white rounded-2xl p-6 shadow-sm mb-4 text-center">
+            <div class="w-20 h-20 bg-orange-50 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl cursor-pointer" onclick="showToast('请选择本地视频')">📁</div>
+            <p class="text-sm font-medium text-gray-800 mb-1">点击上传或选择视频</p>
+            <p class="text-xs text-gray-500">支持 mp4、mov 格式，单次最多 10 个</p>
+          </div>
+          <div class="bg-white rounded-2xl p-4 shadow-sm mb-4">
+            <h4 class="font-medium text-gray-800 text-sm mb-4">切片时长设置</h4>
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-xs text-gray-500">当前时长</span>
+              <span class="text-sm font-bold text-primary">2.5s</span>
+            </div>
+            <input type="range" min="0.5" max="10" step="0.1" value="2.5" class="w-full accent-primary mb-3">
+            <div class="flex justify-between text-xs text-gray-400">
+              <span>0.5s</span>
+              <span>10s</span>
+            </div>
+            <p class="text-xs text-gray-400 mt-3">由管理后台统一配置，范围 0.5~10s，步长 0.1s</p>
+          </div>
+          <button onclick="showToast('开始分割'); navigateTo('page-aicloud-progress')" class="w-full bg-primary text-white py-3 rounded-xl font-medium">开始分割</button>
         </div>
       </div>
 
@@ -2277,6 +2316,7 @@
         <div class="nav-item" onclick="showPageFromNav('app','page-guide')">新手指南</div>
         <div class="nav-item" onclick="showPageFromNav('app','page-aicloud')">AI 云创</div>
         <div class="nav-item" onclick="showPageFromNav('app','page-aicloud-edit')">AI 云创-编辑</div>
+        <div class="nav-item" onclick="showPageFromNav('app','page-aicloud-split')">AI 视频分割</div>
         <div class="nav-item" onclick="showPageFromNav('app','page-aicloud-progress')">AI 云创-进度</div>
         <div class="nav-item" onclick="showPageFromNav('app','page-watermark')">AI 去水印</div>
         <div class="nav-item" onclick="showPageFromNav('app','page-profile')">我的</div>
