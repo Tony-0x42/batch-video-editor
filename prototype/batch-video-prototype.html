@@ -1867,62 +1867,44 @@
         <!-- 文档管理 -->
         <div id="admin-doc" class="admin-content">
           <div class="bg-white rounded-xl shadow-sm p-6">
-            <div class="flex justify-between items-center mb-6">
+            <div class="flex justify-between items-center mb-4">
               <h2 class="text-xl font-bold text-gray-800">文档管理</h2>
-              <button class="bg-primary text-white px-4 py-2 rounded-lg text-sm">+ 新增文档</button>
+              <button onclick="openDocModal()" class="bg-primary text-white px-4 py-2 rounded-lg text-sm">+ 新增文档</button>
+            </div>
+            <div class="flex border-b border-gray-200 mb-4 overflow-x-auto hide-scrollbar" id="docSheetTabs">
+              <div class="px-4 py-2 tab-active cursor-pointer text-sm font-medium whitespace-nowrap" onclick="switchDocSheet('login')">登录页</div>
+              <div class="px-4 py-2 tab-inactive cursor-pointer text-sm font-medium whitespace-nowrap" onclick="switchDocSheet('register')">注册页</div>
+              <div class="px-4 py-2 tab-inactive cursor-pointer text-sm font-medium whitespace-nowrap" onclick="switchDocSheet('mine')">我的页</div>
+              <div class="px-4 py-2 tab-inactive cursor-pointer text-sm font-medium whitespace-nowrap" onclick="switchDocSheet('study')">学习专区</div>
             </div>
             <div class="flex gap-3 mb-4">
-              <input type="text" placeholder="文档标题" class="border border-gray-300 rounded-lg px-3 py-2 text-sm w-64 focus:border-primary focus:outline-none">
-              <select class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary focus:outline-none">
+              <input id="docSearchInput" type="text" placeholder="文档标题" class="border border-gray-300 rounded-lg px-3 py-2 text-sm w-64 focus:border-primary focus:outline-none" oninput="renderAdminDocs()">
+              <select id="docTypeFilter" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary focus:outline-none" onchange="renderAdminDocs()">
                 <option>全部类型</option>
                 <option>用户协议</option>
                 <option>隐私政策</option>
                 <option>新手文档</option>
                 <option>帮助文档</option>
               </select>
-              <select class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary focus:outline-none">
+              <select id="docStatusFilter" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary focus:outline-none" onchange="renderAdminDocs()">
                 <option>全部状态</option>
                 <option>已启用</option>
                 <option>已禁用</option>
               </select>
-              <button class="bg-primary text-white px-4 py-2 rounded-lg text-sm">搜索</button>
+              <button onclick="renderAdminDocs()" class="bg-primary text-white px-4 py-2 rounded-lg text-sm">搜索</button>
             </div>
             <table class="w-full text-sm">
               <thead class="bg-gray-50">
                 <tr>
                   <th class="px-4 py-3 text-left text-gray-600 font-medium">文档标题</th>
                   <th class="px-4 py-3 text-left text-gray-600 font-medium">文档类型</th>
-                  <th class="px-4 py-3 text-left text-gray-600 font-medium">适用页面</th>
                   <th class="px-4 py-3 text-left text-gray-600 font-medium">更新时间</th>
                   <th class="px-4 py-3 text-left text-gray-600 font-medium">状态</th>
                   <th class="px-4 py-3 text-left text-gray-600 font-medium">操作</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-gray-100">
-                <tr class="hover:bg-gray-50">
-                  <td class="px-4 py-3">批量剪辑 用户协议</td>
-                  <td class="px-4 py-3"><span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">用户协议</span></td>
-                  <td class="px-4 py-3">登录页、我的页</td>
-                  <td class="px-4 py-3">2026-06-01</td>
-                  <td class="px-4 py-3"><span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">已启用</span></td>
-                  <td class="px-4 py-3">
-                    <button class="text-primary text-sm mr-2">查看</button>
-                    <button class="text-primary text-sm mr-2">编辑</button>
-                    <button class="text-gray-400 text-sm cursor-not-allowed" disabled>删除</button>
-                  </td>
-                </tr>
-                <tr class="hover:bg-gray-50">
-                  <td class="px-4 py-3">批量剪辑 隐私政策</td>
-                  <td class="px-4 py-3"><span class="px-2 py-1 bg-purple-100 text-purple-700 rounded text-xs">隐私政策</span></td>
-                  <td class="px-4 py-3">登录页、我的页</td>
-                  <td class="px-4 py-3">2026-06-01</td>
-                  <td class="px-4 py-3"><span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">已启用</span></td>
-                  <td class="px-4 py-3">
-                    <button class="text-primary text-sm mr-2">查看</button>
-                    <button class="text-primary text-sm mr-2">编辑</button>
-                    <button class="text-gray-400 text-sm cursor-not-allowed" disabled>删除</button>
-                  </td>
-                </tr>
+              <tbody id="adminDocTableBody" class="divide-y divide-gray-100">
+                <!-- JS renders -->
               </tbody>
             </table>
           </div>
@@ -2204,6 +2186,39 @@
       <div class="flex gap-3">
         <button onclick="closeModal()" class="flex-1 py-2 border border-gray-300 rounded-xl text-sm">取消</button>
         <button id="confirmBtn" onclick="closeModal()" class="flex-1 py-2 bg-primary text-white rounded-xl text-sm">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 新增文档弹窗 -->
+  <div id="docModal" class="modal">
+    <div class="bg-white rounded-2xl p-6 w-[400px] max-w-[90%]">
+      <h3 class="font-bold text-lg text-gray-800 mb-4">新增文档</h3>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm text-gray-700 mb-1">文档标题</label>
+          <input id="docTitleInput" type="text" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-sm text-gray-700 mb-1">文档类型</label>
+          <select id="docTypeInput" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary focus:outline-none">
+            <option>用户协议</option>
+            <option>隐私政策</option>
+            <option>新手文档</option>
+            <option>帮助文档</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm text-gray-700 mb-1">状态</label>
+          <select id="docStatusInput" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary focus:outline-none">
+            <option>已启用</option>
+            <option>已禁用</option>
+          </select>
+        </div>
+      </div>
+      <div class="flex gap-3 mt-6">
+        <button onclick="closeDocModal()" class="flex-1 py-2 border border-gray-300 rounded-xl text-sm">取消</button>
+        <button onclick="saveDoc()" class="flex-1 py-2 bg-primary text-white rounded-xl text-sm">保存</button>
       </div>
     </div>
   </div>
@@ -2659,6 +2674,106 @@
       renderContactManagers();
     }
 
+    // 文档管理 - 按页面 sheet 维护
+    const DOC_SHEETS = [
+      { key: 'login', label: '登录页' },
+      { key: 'register', label: '注册页' },
+      { key: 'mine', label: '我的页' },
+      { key: 'study', label: '学习专区' }
+    ];
+    let currentDocSheet = 'login';
+    let adminDocs = [
+      { id: 1, title: '批量剪辑 用户协议', type: '用户协议', status: '已启用', updateTime: '2026-06-01', page: 'login' },
+      { id: 2, title: '批量剪辑 隐私政策', type: '隐私政策', status: '已启用', updateTime: '2026-06-01', page: 'register' },
+      { id: 3, title: '新手使用指南', type: '新手文档', status: '已启用', updateTime: '2026-06-10', page: 'mine' },
+      { id: 4, title: '短视频运营指南', type: '帮助文档', status: '已启用', updateTime: '2026-06-18', page: 'study' }
+    ];
+
+    function getDocTypeClass(type) {
+      switch (type) {
+        case '用户协议': return 'bg-blue-100 text-blue-700';
+        case '隐私政策': return 'bg-purple-100 text-purple-700';
+        case '新手文档': return 'bg-orange-100 text-orange-700';
+        default: return 'bg-green-100 text-green-700';
+      }
+    }
+
+    function switchDocSheet(sheetKey) {
+      currentDocSheet = sheetKey;
+      document.querySelectorAll('#docSheetTabs > div').forEach((tab, i) => {
+        if (DOC_SHEETS[i] && DOC_SHEETS[i].key === sheetKey) {
+          tab.classList.remove('tab-inactive');
+          tab.classList.add('tab-active');
+        } else {
+          tab.classList.remove('tab-active');
+          tab.classList.add('tab-inactive');
+        }
+      });
+      renderAdminDocs();
+    }
+
+    function renderAdminDocs() {
+      const tbody = document.getElementById('adminDocTableBody');
+      if (!tbody) return;
+      const search = (document.getElementById('docSearchInput')?.value || '').trim();
+      const typeFilter = document.getElementById('docTypeFilter')?.value || '全部类型';
+      const statusFilter = document.getElementById('docStatusFilter')?.value || '全部状态';
+      let list = adminDocs.filter(d => d.page === currentDocSheet);
+      if (search) list = list.filter(d => d.title.includes(search));
+      if (typeFilter !== '全部类型') list = list.filter(d => d.type === typeFilter);
+      if (statusFilter !== '全部状态') list = list.filter(d => d.status === statusFilter);
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-8 text-center text-gray-400 text-sm">当前页面暂无文档</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = list.map(doc => `
+        <tr class="hover:bg-gray-50">
+          <td class="px-4 py-3">${doc.title}</td>
+          <td class="px-4 py-3"><span class="px-2 py-1 rounded text-xs ${getDocTypeClass(doc.type)}">${doc.type}</span></td>
+          <td class="px-4 py-3">${doc.updateTime}</td>
+          <td class="px-4 py-3"><span class="px-2 py-1 ${doc.status === '已启用' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'} rounded text-xs">${doc.status}</span></td>
+          <td class="px-4 py-3">
+            <button class="text-primary text-sm mr-2" onclick="showToast('查看文档：${doc.title}')">查看</button>
+            <button class="text-primary text-sm mr-2" onclick="showToast('编辑文档：${doc.title}')">编辑</button>
+            <button class="text-red-500 text-sm" onclick="showConfirm('确定删除“${doc.title}”吗？', () => deleteAdminDoc(${doc.id}))">删除</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function deleteAdminDoc(id) {
+      adminDocs = adminDocs.filter(d => d.id !== id);
+      renderAdminDocs();
+      showToast('已删除');
+    }
+
+    function openDocModal() {
+      document.getElementById('docTitleInput').value = '';
+      document.getElementById('docTypeInput').value = '用户协议';
+      document.getElementById('docStatusInput').value = '已启用';
+      document.getElementById('docModal').classList.add('active');
+    }
+
+    function closeDocModal() {
+      document.getElementById('docModal').classList.remove('active');
+    }
+
+    function saveDoc() {
+      const title = document.getElementById('docTitleInput').value.trim();
+      if (!title) {
+        showToast('请输入文档标题');
+        return;
+      }
+      const type = document.getElementById('docTypeInput').value;
+      const status = document.getElementById('docStatusInput').value;
+      const newId = adminDocs.length > 0 ? Math.max(...adminDocs.map(d => d.id)) + 1 : 1;
+      const today = new Date().toISOString().slice(0, 10);
+      adminDocs.push({ id: newId, title, type, status, updateTime: today, page: currentDocSheet });
+      closeDocModal();
+      renderAdminDocs();
+      showToast('文档新增成功');
+    }
+
     // 保存全局参数（分镜头配置等）
     function saveGlobalConfig() {
       const shotCount = document.getElementById('configShotCount').value;
@@ -2684,6 +2799,7 @@
         item.classList.remove('hover:bg-gray-50', 'text-gray-700');
         item.classList.add('bg-primaryBg', 'text-primary');
       }
+      if (pageId === 'admin-doc') renderAdminDocs();
     }
 
     // 去水印解析
