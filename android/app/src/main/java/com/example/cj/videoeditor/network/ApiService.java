@@ -5,6 +5,7 @@ import com.example.cj.videoeditor.network.dto.*;
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.MultipartBody;
 import retrofit2.Call;
 import retrofit2.http.*;
 
@@ -45,6 +46,13 @@ public interface ApiService {
 
     @POST("batch/app/logout")
     Call<BaseResponse<Object>> appLogout();
+
+    @Multipart
+    @POST("batch/app/upload")
+    Call<BaseResponse<String>> uploadAvatar(@Part MultipartBody.Part file);
+
+    @DELETE("batch/app/customer")
+    Call<BaseResponse<Object>> deleteCurrentCustomer();
 
     // ==================== 客户/APP 账号 ====================
 
