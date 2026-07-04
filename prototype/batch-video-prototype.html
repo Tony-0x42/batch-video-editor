@@ -1625,48 +1625,175 @@
         <div id="admin-home-config" class="admin-content">
           <div class="bg-white rounded-xl shadow-sm p-6">
             <h2 class="text-xl font-bold text-gray-800 mb-6">首页内容管理</h2>
-            <div class="flex border-b border-gray-200 mb-6">
-              <div class="px-4 py-2 tab-active cursor-pointer text-sm font-medium">轮播图管理</div>
-              <div class="px-4 py-2 tab-inactive cursor-pointer text-sm font-medium">喜报数据管理</div>
-              <div class="px-4 py-2 tab-inactive cursor-pointer text-sm font-medium">功能入口配置</div>
-              <div class="px-4 py-2 tab-inactive cursor-pointer text-sm font-medium">教程入口配置</div>
+            <div class="flex border-b border-gray-200 mb-6" id="homeConfigTabs">
+              <div class="px-4 py-2 tab-active cursor-pointer text-sm font-medium" onclick="switchHomeConfigTab('banner')">轮播图管理</div>
+              <div class="px-4 py-2 tab-inactive cursor-pointer text-sm font-medium" onclick="switchHomeConfigTab('report')">喜报数据管理</div>
+              <div class="px-4 py-2 tab-inactive cursor-pointer text-sm font-medium" onclick="switchHomeConfigTab('entry')">功能入口配置</div>
+              <div class="px-4 py-2 tab-inactive cursor-pointer text-sm font-medium" onclick="switchHomeConfigTab('guide')">教程入口配置</div>
             </div>
-            <div class="flex justify-between items-center mb-4">
-              <button class="bg-primary text-white px-4 py-2 rounded-lg text-sm">+ 新增轮播图</button>
-            </div>
-            <div class="grid grid-cols-3 gap-4">
-              <div class="border border-gray-200 rounded-xl overflow-hidden">
-                <div class="h-32 bg-gradient-to-r from-blue-500 to-blue-400 flex items-center justify-center text-white font-bold">轮播图1</div>
-                <div class="p-3">
-                  <p class="text-sm font-medium">品牌发布会</p>
-                  <p class="text-xs text-gray-500 mt-1">排序：1 · 已启用</p>
-                  <div class="flex gap-2 mt-2">
-                    <button class="text-xs text-primary">编辑</button>
-                    <button class="text-xs text-red-500">删除</button>
+
+            <!-- 轮播图管理 -->
+            <div id="home-tab-banner" class="home-tab-content">
+              <div class="flex justify-between items-center mb-4">
+                <button class="bg-primary text-white px-4 py-2 rounded-lg text-sm">+ 新增轮播图</button>
+              </div>
+              <div class="grid grid-cols-3 gap-4">
+                <div class="border border-gray-200 rounded-xl overflow-hidden">
+                  <div class="h-32 bg-gradient-to-r from-blue-500 to-blue-400 flex items-center justify-center text-white font-bold">轮播图1</div>
+                  <div class="p-3">
+                    <p class="text-sm font-medium">品牌发布会</p>
+                    <p class="text-xs text-gray-500 mt-1">排序：1 · 已启用</p>
+                    <div class="flex gap-2 mt-2">
+                      <button class="text-xs text-primary">编辑</button>
+                      <button class="text-xs text-red-500">删除</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="border border-gray-200 rounded-xl overflow-hidden">
+                  <div class="h-32 bg-gradient-to-r from-blue-600 to-blue-500 flex items-center justify-center text-white font-bold">轮播图2</div>
+                  <div class="p-3">
+                    <p class="text-sm font-medium">夏季招商大会</p>
+                    <p class="text-xs text-gray-500 mt-1">排序：2 · 已启用</p>
+                    <div class="flex gap-2 mt-2">
+                      <button class="text-xs text-primary">编辑</button>
+                      <button class="text-xs text-red-500">删除</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="border border-gray-200 rounded-xl overflow-hidden">
+                  <div class="h-32 bg-gradient-to-r from-sky-500 to-blue-500 flex items-center justify-center text-white font-bold">轮播图3</div>
+                  <div class="p-3">
+                    <p class="text-sm font-medium">新功能上线</p>
+                    <p class="text-xs text-gray-500 mt-1">排序：3 · 已启用</p>
+                    <div class="flex gap-2 mt-2">
+                      <button class="text-xs text-primary">编辑</button>
+                      <button class="text-xs text-red-500">删除</button>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div class="border border-gray-200 rounded-xl overflow-hidden">
-                <div class="h-32 bg-gradient-to-r from-blue-600 to-blue-500 flex items-center justify-center text-white font-bold">轮播图2</div>
-                <div class="p-3">
-                  <p class="text-sm font-medium">夏季招商大会</p>
-                  <p class="text-xs text-gray-500 mt-1">排序：2 · 已启用</p>
-                  <div class="flex gap-2 mt-2">
-                    <button class="text-xs text-primary">编辑</button>
-                    <button class="text-xs text-red-500">删除</button>
-                  </div>
+            </div>
+
+            <!-- 喜报数据管理 -->
+            <div id="home-tab-report" class="home-tab-content hidden max-w-2xl space-y-6">
+              <div class="bg-amber-50 rounded-xl p-4 border border-amber-100">
+                <h3 class="font-bold text-amber-800 text-sm mb-1">首页喜报预览</h3>
+                <p class="text-xs text-gray-600">配置后将同步展示在 APP 首页喜报区域</p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">喜报标题</label>
+                <input type="text" value="🎉 恭喜华东区超额完成 Q2 目标！" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary focus:outline-none">
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">销售冠军姓名</label>
+                  <input type="text" value="王小明" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary focus:outline-none">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">业绩金额</label>
+                  <input type="text" value="586000" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary focus:outline-none">
                 </div>
               </div>
-              <div class="border border-gray-200 rounded-xl overflow-hidden">
-                <div class="h-32 bg-gradient-to-r from-sky-500 to-blue-500 flex items-center justify-center text-white font-bold">轮播图3</div>
-                <div class="p-3">
-                  <p class="text-sm font-medium">新功能上线</p>
-                  <p class="text-xs text-gray-500 mt-1">排序：3 · 已启用</p>
-                  <div class="flex gap-2 mt-2">
-                    <button class="text-xs text-primary">编辑</button>
-                    <button class="text-xs text-red-500">删除</button>
-                  </div>
-                </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">标签文字</label>
+                <input type="text" value="销售冠军" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary focus:outline-none">
+              </div>
+              <div>
+                <label class="flex items-center gap-2 text-sm text-gray-700">
+                  <input type="checkbox" checked class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary">
+                  在首页展示喜报
+                </label>
+              </div>
+              <div class="pt-4">
+                <button onclick="showToast('喜报数据保存成功')" class="bg-primary text-white px-6 py-2 rounded-lg text-sm">保存喜报配置</button>
+              </div>
+            </div>
+
+            <!-- 功能入口配置 -->
+            <div id="home-tab-entry" class="home-tab-content hidden">
+              <div class="bg-blue-50 rounded-xl p-4 mb-4">
+                <h3 class="font-bold text-primary text-sm mb-1">首页功能入口</h3>
+                <p class="text-xs text-gray-600">配置 APP 首页功能导航区的入口名称、图标与显示状态</p>
+              </div>
+              <table class="w-full text-sm">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-4 py-3 text-left text-gray-600 font-medium">排序</th>
+                    <th class="px-4 py-3 text-left text-gray-600 font-medium">入口名称</th>
+                    <th class="px-4 py-3 text-left text-gray-600 font-medium">图标</th>
+                    <th class="px-4 py-3 text-left text-gray-600 font-medium">跳转页面</th>
+                    <th class="px-4 py-3 text-left text-gray-600 font-medium">状态</th>
+                    <th class="px-4 py-3 text-left text-gray-600 font-medium">操作</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                  <tr>
+                    <td class="px-4 py-3">1</td>
+                    <td class="px-4 py-3">学习专区</td>
+                    <td class="px-4 py-3">📚</td>
+                    <td class="px-4 py-3">page-study</td>
+                    <td class="px-4 py-3"><span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">启用</span></td>
+                    <td class="px-4 py-3"><button class="text-primary text-sm">编辑</button></td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3">2</td>
+                    <td class="px-4 py-3">信息咨询</td>
+                    <td class="px-4 py-3">📞</td>
+                    <td class="px-4 py-3">page-contact</td>
+                    <td class="px-4 py-3"><span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">启用</span></td>
+                    <td class="px-4 py-3"><button class="text-primary text-sm">编辑</button></td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3">3</td>
+                    <td class="px-4 py-3">品牌专区</td>
+                    <td class="px-4 py-3">🏷️</td>
+                    <td class="px-4 py-3">page-brand</td>
+                    <td class="px-4 py-3"><span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">启用</span></td>
+                    <td class="px-4 py-3"><button class="text-primary text-sm">编辑</button></td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3">4</td>
+                    <td class="px-4 py-3">其他服务</td>
+                    <td class="px-4 py-3">➕</td>
+                    <td class="px-4 py-3">-</td>
+                    <td class="px-4 py-3"><span class="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs">预留</span></td>
+                    <td class="px-4 py-3"><button class="text-primary text-sm">编辑</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- 教程入口配置 -->
+            <div id="home-tab-guide" class="home-tab-content hidden max-w-2xl space-y-6">
+              <div class="bg-blue-50 rounded-xl p-4 mb-4">
+                <h3 class="font-bold text-primary text-sm mb-1">首页教程入口</h3>
+                <p class="text-xs text-gray-600">配置 APP 首页新手指南卡片的内容与跳转</p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">卡片标题</label>
+                <input type="text" value="新手指南" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">卡片副标题</label>
+                <input type="text" value="快速上手 AI 视频创作" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">图标 Emoji</label>
+                <input type="text" value="🚀" class="w-20 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">跳转页面</label>
+                <select class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary focus:outline-none">
+                  <option>page-guide</option>
+                  <option>page-study</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">底部提示文字</label>
+                <input type="text" value="查看操作指南、常见问题" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary focus:outline-none">
+              </div>
+              <div class="pt-4">
+                <button onclick="showToast('教程入口配置保存成功')" class="bg-primary text-white px-6 py-2 rounded-lg text-sm">保存教程入口</button>
               </div>
             </div>
           </div>
@@ -1865,15 +1992,22 @@
         <div id="admin-system" class="admin-content">
           <div class="bg-white rounded-xl shadow-sm p-6">
             <h2 class="text-xl font-bold text-gray-800 mb-6">系统配置</h2>
-            <div class="flex border-b border-gray-200 mb-6" id="systemConfigTabs">
-              <div class="px-4 py-2 tab-active cursor-pointer text-sm font-medium" onclick="switchSystemTab('brand')">品牌配置</div>
-              <div class="px-4 py-2 tab-inactive cursor-pointer text-sm font-medium" onclick="switchSystemTab('version')">版本管理</div>
-              <div class="px-4 py-2 tab-inactive cursor-pointer text-sm font-medium" onclick="switchSystemTab('global')">全局参数</div>
-              <div class="px-4 py-2 tab-inactive cursor-pointer text-sm font-medium" onclick="switchSystemTab('log')">日志管理</div>
+            <div class="flex border-b border-gray-200 mb-6 overflow-x-auto hide-scrollbar" id="systemConfigTabs">
+              <div class="px-4 py-2 tab-active cursor-pointer text-sm font-medium whitespace-nowrap" onclick="switchSystemTab('brand')">品牌配置</div>
+              <div class="px-4 py-2 tab-inactive cursor-pointer text-sm font-medium whitespace-nowrap" onclick="switchSystemTab('contact')">联系方式</div>
+              <div class="px-4 py-2 tab-inactive cursor-pointer text-sm font-medium whitespace-nowrap" onclick="switchSystemTab('copy')">宣传文案</div>
+              <div class="px-4 py-2 tab-inactive cursor-pointer text-sm font-medium whitespace-nowrap" onclick="switchSystemTab('media')">图文素材</div>
+              <div class="px-4 py-2 tab-inactive cursor-pointer text-sm font-medium whitespace-nowrap" onclick="switchSystemTab('version')">版本管理</div>
+              <div class="px-4 py-2 tab-inactive cursor-pointer text-sm font-medium whitespace-nowrap" onclick="switchSystemTab('global')">全局参数</div>
+              <div class="px-4 py-2 tab-inactive cursor-pointer text-sm font-medium whitespace-nowrap" onclick="switchSystemTab('log')">日志管理</div>
             </div>
 
             <!-- 品牌配置 -->
             <div id="system-tab-brand" class="system-tab-content max-w-2xl space-y-6">
+              <div class="bg-blue-50 rounded-xl p-4">
+                <h3 class="font-bold text-primary text-sm mb-1">品牌素材配置</h3>
+                <p class="text-xs text-gray-600">以下配置将下发至 APP 端与后台，前端仅做展示，不可本地修改。</p>
+              </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">APP Logo</label>
                 <div class="w-24 h-24 bg-primary rounded-xl flex items-center justify-center text-white text-2xl font-bold">云</div>
@@ -1882,6 +2016,11 @@
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">后台 Logo</label>
                 <div class="w-24 h-24 bg-primary rounded-xl flex items-center justify-center text-white text-2xl font-bold">云</div>
+                <button class="mt-2 text-sm text-primary">更换图片</button>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">启动页背景图</label>
+                <div class="w-full h-32 bg-gradient-to-r from-blue-400 to-blue-600 rounded-xl flex items-center justify-center text-white font-bold">启动页</div>
                 <button class="mt-2 text-sm text-primary">更换图片</button>
               </div>
               <div>
@@ -1902,6 +2041,118 @@
               <div class="pt-4">
                 <button onclick="showToast('品牌配置保存成功')" class="bg-primary text-white px-6 py-2 rounded-lg text-sm">保存配置</button>
               </div>
+            </div>
+
+            <!-- 联系方式 -->
+            <div id="system-tab-contact" class="system-tab-content hidden max-w-2xl space-y-6">
+              <div class="bg-blue-50 rounded-xl p-4">
+                <h3 class="font-bold text-primary text-sm mb-1">APP 联系方式配置</h3>
+                <p class="text-xs text-gray-600">配置信息咨询页与联系客服页展示的电话、在线客服、负责人等信息。</p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">客服电话</label>
+                <input type="text" value="400-888-8888" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">服务时段</label>
+                <input type="text" value="早 9:00-18:00" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">在线客服入口名称</label>
+                <input type="text" value="联系在线客服" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">各地经销负责人</label>
+                <div class="space-y-3">
+                  <div class="grid grid-cols-3 gap-3">
+                    <input type="text" value="张经理" class="border border-gray-300 rounded-lg px-3 py-2 text-sm" placeholder="姓名">
+                    <input type="text" value="华东地区" class="border border-gray-300 rounded-lg px-3 py-2 text-sm" placeholder="区域">
+                    <input type="text" value="138-0000-0001" class="border border-gray-300 rounded-lg px-3 py-2 text-sm" placeholder="电话">
+                  </div>
+                  <div class="grid grid-cols-3 gap-3">
+                    <input type="text" value="李经理" class="border border-gray-300 rounded-lg px-3 py-2 text-sm" placeholder="姓名">
+                    <input type="text" value="华南地区" class="border border-gray-300 rounded-lg px-3 py-2 text-sm" placeholder="区域">
+                    <input type="text" value="138-0000-0002" class="border border-gray-300 rounded-lg px-3 py-2 text-sm" placeholder="电话">
+                  </div>
+                </div>
+              </div>
+              <div class="pt-4">
+                <button onclick="showToast('联系方式保存成功')" class="bg-primary text-white px-6 py-2 rounded-lg text-sm">保存联系方式</button>
+              </div>
+            </div>
+
+            <!-- 宣传文案 -->
+            <div id="system-tab-copy" class="system-tab-content hidden max-w-2xl space-y-6">
+              <div class="bg-blue-50 rounded-xl p-4">
+                <h3 class="font-bold text-primary text-sm mb-1">宣传文案配置</h3>
+                <p class="text-xs text-gray-600">配置首页、登录页、空状态等位置展示的宣传文案，前端仅做展示。</p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">登录页副标题</label>
+                <input type="text" value="AI短视频创作与去水印工具" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">首页功能区标题</label>
+                <input type="text" value="功能导航" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">AI 去水印空状态提示</label>
+                <textarea class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm h-20 focus:border-primary focus:outline-none">粘贴短视频平台分享链接，点击解析即可去除水印</textarea>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">AI 去水印支持平台提示</label>
+                <input type="text" value="支持抖音、小红书等平台" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary focus:outline-none">
+              </div>
+              <div class="pt-4">
+                <button onclick="showToast('宣传文案保存成功')" class="bg-primary text-white px-6 py-2 rounded-lg text-sm">保存文案</button>
+              </div>
+            </div>
+
+            <!-- 图文素材 -->
+            <div id="system-tab-media" class="system-tab-content hidden">
+              <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-gray-800">图文素材库</h3>
+                <button class="bg-primary text-white px-4 py-2 rounded-lg text-sm">+ 新增素材</button>
+              </div>
+              <div class="flex gap-3 mb-4">
+                <input type="text" placeholder="素材名称" class="border border-gray-300 rounded-lg px-3 py-2 text-sm w-64 focus:border-primary focus:outline-none">
+                <select class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary focus:outline-none">
+                  <option>全部类型</option>
+                  <option>图片</option>
+                  <option>文案</option>
+                </select>
+                <button class="bg-primary text-white px-4 py-2 rounded-lg text-sm">搜索</button>
+              </div>
+              <table class="w-full text-sm">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-4 py-3 text-left text-gray-600 font-medium">素材名称</th>
+                    <th class="px-4 py-3 text-left text-gray-600 font-medium">类型</th>
+                    <th class="px-4 py-3 text-left text-gray-600 font-medium">适用页面</th>
+                    <th class="px-4 py-3 text-left text-gray-600 font-medium">更新时间</th>
+                    <th class="px-4 py-3 text-left text-gray-600 font-medium">状态</th>
+                    <th class="px-4 py-3 text-left text-gray-600 font-medium">操作</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                  <tr>
+                    <td class="px-4 py-3">首页Banner图1</td>
+                    <td class="px-4 py-3"><span class="px-2 py-1 bg-purple-100 text-purple-700 rounded text-xs">图片</span></td>
+                    <td class="px-4 py-3">首页轮播</td>
+                    <td class="px-4 py-3">2026-07-04</td>
+                    <td class="px-4 py-3"><span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">启用</span></td>
+                    <td class="px-4 py-3"><button class="text-primary text-sm mr-2">编辑</button><button class="text-red-500 text-sm">删除</button></td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3">AI云创功能介绍文案</td>
+                    <td class="px-4 py-3"><span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">文案</span></td>
+                    <td class="px-4 py-3">功能入口/教程</td>
+                    <td class="px-4 py-3">2026-07-03</td>
+                    <td class="px-4 py-3"><span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">启用</span></td>
+                    <td class="px-4 py-3"><button class="text-primary text-sm mr-2">编辑</button><button class="text-red-500 text-sm">删除</button></td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
 
             <!-- 版本管理 -->
@@ -2321,7 +2572,7 @@
     // 系统配置 Tab 切换
     function switchSystemTab(tabName) {
       document.querySelectorAll('#systemConfigTabs > div').forEach((tab, i) => {
-        const names = ['brand', 'version', 'global', 'log'];
+        const names = ['brand', 'contact', 'copy', 'media', 'version', 'global', 'log'];
         if (names[i] === tabName) {
           tab.classList.remove('tab-inactive');
           tab.classList.add('tab-active');
@@ -2332,6 +2583,22 @@
       });
       document.querySelectorAll('.system-tab-content').forEach(c => c.classList.add('hidden'));
       document.getElementById('system-tab-' + tabName).classList.remove('hidden');
+    }
+
+    // 首页内容管理 Tab 切换
+    function switchHomeConfigTab(tabName) {
+      document.querySelectorAll('#homeConfigTabs > div').forEach((tab, i) => {
+        const names = ['banner', 'report', 'entry', 'guide'];
+        if (names[i] === tabName) {
+          tab.classList.remove('tab-inactive');
+          tab.classList.add('tab-active');
+        } else {
+          tab.classList.remove('tab-active');
+          tab.classList.add('tab-inactive');
+        }
+      });
+      document.querySelectorAll('.home-tab-content').forEach(c => c.classList.add('hidden'));
+      document.getElementById('home-tab-' + tabName).classList.remove('hidden');
     }
 
     // 保存全局参数（分镜头配置等）
