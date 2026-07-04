@@ -679,25 +679,14 @@
             </div>
             <button onclick="parseWatermark()" class="w-full bg-primary text-white py-3 rounded-xl mt-3 font-medium">解析</button>
           </div>
-          <div id="watermarkResult" class="hidden">
-            <div class="flex bg-white border-b border-gray-100">
-              <div class="flex-1 py-3 text-center text-sm tab-active">视频</div>
-              <div class="flex-1 py-3 text-center text-sm tab-inactive">图片</div>
-              <div class="flex-1 py-3 text-center text-sm tab-inactive">文本</div>
-            </div>
-            <div class="p-4">
-              <div class="bg-black rounded-xl h-56 flex items-center justify-center mb-4">
-                <div class="text-center text-white">
-                  <span class="text-4xl">▶️</span>
-                  <p class="text-sm mt-2">去水印成片预览</p>
-                </div>
+          <div id="watermarkResult" class="hidden p-4">
+            <div class="bg-black rounded-xl h-56 flex items-center justify-center mb-4">
+              <div class="text-center text-white">
+                <span class="text-4xl">▶️</span>
+                <p class="text-sm mt-2">去水印成片预览</p>
               </div>
-              <div class="bg-white rounded-xl p-4 shadow-sm mb-4">
-                <h4 class="font-medium text-gray-800 text-sm mb-2">视频文案</h4>
-                <p class="text-sm text-gray-600">这是一款超好用的产品，快来试试吧！#好物推荐 #短视频</p>
-              </div>
-              <button class="w-full bg-primary text-white py-3 rounded-xl font-medium">保存到相册</button>
             </div>
+            <button onclick="showToast('已保存到相册')" class="w-full bg-primary text-white py-3 rounded-xl font-medium">保存到相册</button>
           </div>
           <div id="watermarkEmpty" class="flex-1 flex flex-col items-center justify-center p-8 text-center">
             <div class="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center text-3xl mb-4">🔗</div>
