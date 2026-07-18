@@ -2,7 +2,7 @@
 
 ## 1. 背景与目标
 
-当前 `prototype/batchvideo-prototype.html` 原型中：
+当前 `prototype/batch-video-prototype.html` 原型中：
 
 - 「信息咨询」页（`page-contact`）有「联系在线客服」按钮，但点击无响应。
 - 「我的 → 联系客服」页（`page-service`）有「在线客服」按钮，同样无响应。
@@ -88,7 +88,7 @@ page-chat
 
 ## 8. 实现范围
 
-本次仅修改 `prototype/batchvideo-prototype.html`：
+本次仅修改 `prototype/batch-video-prototype.html`：
 
 1. 新增 `page-chat` 页面 DOM。
 2. 修改 `page-contact` 和 `page-service` 的「在线客服」按钮 `onclick`。

@@ -22,7 +22,7 @@ public class UserSession {
         SharedPrefUtil.putString(context, AppConfig.SP_KEY_USER_AVATAR, user.getAvatar());
         SharedPrefUtil.putBoolean(context, AppConfig.SP_KEY_USER_VIP, user.isVip());
         SharedPrefUtil.putString(context, AppConfig.SP_KEY_USER_VIP_EXPIRE, user.getVipExpire());
-        SharedPrefUtil.putInt(context, AppConfig.SP_KEY_COMPUTE_TOTAL, user.getComputePower() > 0 ? user.getComputePower() : 1000);
+        SharedPrefUtil.putInt(context, AppConfig.SP_KEY_COMPUTE_TOTAL, Math.max(user.getComputePower(), 0));
         SharedPrefUtil.putInt(context, AppConfig.SP_KEY_COMPUTE_USED, user.getUsedComputePower());
     }
 
@@ -35,7 +35,7 @@ public class UserSession {
         String phone = customer.getPhone() != null ? customer.getPhone() : "";
         String name = !TextUtils.isEmpty(customer.getCustomerName())
                 ? customer.getCustomerName() : phone;
-        String avatar = customer.getQrCodeUrl() != null ? customer.getQrCodeUrl() : "";
+        String avatar = customer.getAvatarUrl() != null ? customer.getAvatarUrl() : "";
         boolean vip = isVipValid(customer);
 
         SharedPrefUtil.putBoolean(context, AppConfig.SP_KEY_IS_LOGIN, true);

@@ -44,6 +44,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </trim>
     </insert>
 
+    <insert id="insertBatchAiVideoClipBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="clipId">
+        insert into batch_ai_video_clip (group_id, video_url, text_content, duration, sort_order)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.groupId}, #{item.videoUrl}, #{item.textContent}, #{item.duration}, #{item.sortOrder})
+        </foreach>
+    </insert>
+
     <update id="updateBatchAiVideoClip" parameterType="com.ruoyi.batch.aivideo.domain.BatchAiVideoClip">
         update batch_ai_video_clip
         <set>

@@ -10,6 +10,12 @@ android {
     compileSdk 35
     buildToolsVersion "37.0.0"
 
+    // 后端 Base URL：可在 gradle.properties 中用 API_BASE_URL 覆盖，
+    // 或用 API_BASE_URL_DEBUG / API_BASE_URL_RELEASE 分别为 debug/release 指定不同值
+    def apiBaseUrl = project.findProperty('API_BASE_URL') ?: 'http://192.168.1.5:8080/'
+    def apiBaseUrlDebug = project.findProperty('API_BASE_URL_DEBUG') ?: apiBaseUrl
+    def apiBaseUrlRelease = project.findProperty('API_BASE_URL_RELEASE') ?: apiBaseUrl
+
     defaultConfig {
         applicationId "com.example.cj.videoeditor"
         minSdk 24
@@ -26,9 +32,14 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField "String", "API_BASE_URL", "\"${apiBaseUrlDebug}\""
+        }
         release {
+            // 暂不开启混淆，避免上线前引入反射/序列化类丢失风险
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField "String", "API_BASE_URL", "\"${apiBaseUrlRelease}\""
         }
     }
 
@@ -49,6 +60,7 @@ android {
 
     buildFeatures {
         compose true
+        buildConfig true
     }
 
     composeOptions {
@@ -119,6 +131,9 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:4.12.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'
     implementation 'com.google.code.gson:gson:2.11.0'
+
+    // 二维码扫描（注册页扫码获取上级手机号）
+    implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
 
     // 网络请求（Retrofit + OkHttp + Gson）
     implementation 'com.squareup.retrofit2:retrofit:2.11.0'

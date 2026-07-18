@@ -144,6 +144,7 @@ public class BatchAppAuthController extends BaseController
         update.setCustomerId(customerId);
         update.setCustomerName(customer.getCustomerName());
         update.setContactName(customer.getContactName());
+        update.setAvatarUrl(customer.getAvatarUrl());
         // 禁止修改敏感字段
         update.setPhone(null);
         update.setPassword(null);
@@ -154,6 +155,34 @@ public class BatchAppAuthController extends BaseController
         update.setComputingPowerUsed(null);
         update.setComputingPowerRemain(null);
 
+        return toAjax(customerService.updateBatchCustomer(update));
+    }
+
+    /**
+     * APP 修改当前账号密码
+     */
+    @PostMapping("/changePassword")
+    public AjaxResult changePassword(@Valid @RequestBody ChangePasswordBody passwordBody)
+    {
+        LoginUser loginUser = getLoginUser();
+        BatchCustomer customer = customerService.selectBatchCustomerByPhone(loginUser.getUsername());
+        if (customer == null)
+        {
+            return AjaxResult.error("账号不存在");
+        }
+        if (!SecurityUtils.matchesPassword(passwordBody.getOldPassword(), customer.getPassword()))
+        {
+            return AjaxResult.error("原密码错误");
+        }
+        String newPassword = passwordBody.getNewPassword();
+        if (newPassword.length() < 6 || newPassword.length() > 20)
+        {
+            return AjaxResult.error("新密码长度必须为6-20位");
+        }
+
+        BatchCustomer update = new BatchCustomer();
+        update.setCustomerId(customer.getCustomerId());
+        update.setPassword(SecurityUtils.encryptPassword(newPassword));
         return toAjax(customerService.updateBatchCustomer(update));
     }
 
@@ -292,6 +321,38 @@ public class BatchAppAuthController extends BaseController
         public void setPassword(String password)
         {
             this.password = password;
+        }
+    }
+
+    /**
+     * APP 修改密码请求体
+     */
+    public static class ChangePasswordBody
+    {
+        @NotBlank(message = "原密码不能为空")
+        private String oldPassword;
+
+        @NotBlank(message = "新密码不能为空")
+        private String newPassword;
+
+        public String getOldPassword()
+        {
+            return oldPassword;
+        }
+
+        public void setOldPassword(String oldPassword)
+        {
+            this.oldPassword = oldPassword;
+        }
+
+        public String getNewPassword()
+        {
+            return newPassword;
+        }
+
+        public void setNewPassword(String newPassword)
+        {
+            this.newPassword = newPassword;
         }
     }
 

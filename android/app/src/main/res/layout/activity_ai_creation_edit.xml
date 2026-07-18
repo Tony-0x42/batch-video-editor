@@ -20,20 +20,103 @@
             android:textColor="@color/textPrimary"
             android:textSize="14sp" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_view"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="切片时长"
+                android:textColor="@color/textPrimary"
+                android:textSize="14sp" />
+
+            <SeekBar
+                android:id="@+id/seek_slice_duration"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="12dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/tv_slice_duration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="52dp"
+                android:textColor="@color/colorPrimary"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="生成数量"
+                android:textColor="@color/textPrimary"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tv_generate_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:background="@drawable/bg_input_normal"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="8dp"
+                android:textColor="@color/colorPrimary"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_upload_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textColor="@color/colorPrimary"
+            android:textSize="12sp"
+            android:visibility="gone" />
+
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="8dp"
+            android:layout_weight="1">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <TextView
+                android:id="@+id/tv_empty_clips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="暂无分镜头，请先从相册选择视频"
+                android:textColor="@color/textSecondary"
+                android:textSize="14sp"
+                android:visibility="gone" />
+
+        </FrameLayout>
 
         <Button
-            android:id="@+id/btn_add_clip"
+            android:id="@+id/btn_pick_video"
             style="@style/SecondaryButton"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_marginTop="8dp"
-            android:text="添加分镜头" />
+            android:text="从相册选择视频" />
 
         <Button
             android:id="@+id/btn_generate"

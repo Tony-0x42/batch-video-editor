@@ -1,6 +1,7 @@
 package com.ruoyi.batch.aivideo.mapper;
 
 import java.util.List;
+import org.apache.ibatis.annotations.Param;
 import com.ruoyi.batch.aivideo.domain.BatchAiVideoGroup;
 
 /**
@@ -36,5 +37,5 @@ public interface BatchAiVideoGroupMapper
     /**
      * 增加已生成次数
      */
-    public int incrementGeneratedCount(Long groupId);
+    public int incrementGeneratedCount(@Param("groupId") Long groupId, @Param("count") int count);
 }

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.batch.customer.mapper.BatchQrCodeStatMapper">
+
+    <insert id="incrementScanCount" parameterType="String">
+        insert into batch_qr_code_stat (phone, scan_count, download_count, register_count, stat_date)
+        values (#{phone}, 1, 0, 0, curdate())
+        on duplicate key update scan_count = scan_count + 1
+    </insert>
+
+    <insert id="incrementDownloadCount" parameterType="String">
+        insert into batch_qr_code_stat (phone, scan_count, download_count, register_count, stat_date)
+        values (#{phone}, 0, 1, 0, curdate())
+        on duplicate key update download_count = download_count + 1
+    </insert>
+
+    <insert id="incrementRegisterCount" parameterType="String">
+        insert into batch_qr_code_stat (phone, scan_count, download_count, register_count, stat_date)
+        values (#{phone}, 0, 0, 1, curdate())
+        on duplicate key update register_count = register_count + 1
+    </insert>
+
+    <select id="selectTotalsByPhone" parameterType="String" resultType="java.util.Map">
+        select ifnull(sum(scan_count), 0) as scanCount,
+               ifnull(sum(download_count), 0) as downloadCount,
+               ifnull(sum(register_count), 0) as registerCount
+        from batch_qr_code_stat
+        where phone = #{phone}
+    </select>
+
+</mapper>

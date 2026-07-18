@@ -13,6 +13,11 @@ public abstract class ApiCallback<T> implements Callback<BaseResponse<T>> {
 
     @Override
     public void onResponse(Call<BaseResponse<T>> call, Response<BaseResponse<T>> response) {
+        Integer bizCode = response.body() != null ? response.body().getCode() : null;
+        if (SessionExpiredHandler.isSessionExpired(response.code(), bizCode)) {
+            SessionExpiredHandler.handleSessionExpired();
+            return;
+        }
         if (response.isSuccessful() && response.body() != null) {
             BaseResponse<T> body = response.body();
             if (body.isSuccess()) {

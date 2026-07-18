@@ -43,6 +43,20 @@ public class BatchComputingPowerLogController extends BaseController
     }
 
     /**
+     * APP 查询当前登录账号的算力消耗日志（分页）
+     */
+    @PreAuthorize("@ss.hasPermi('app:user')")
+    @Log(title = "算力消耗日志", businessType = BusinessType.OTHER)
+    @GetMapping("/my")
+    public TableDataInfo my(BatchComputingPowerLog log)
+    {
+        log.setPhone(getUsername());
+        startPage();
+        List<BatchComputingPowerLog> list = computingPowerLogService.selectList(log);
+        return getDataTable(list);
+    }
+
+    /**
      * 消耗算力（APP 端下载/生成前调用）
      */
     @PreAuthorize("@ss.hasPermi('app:user')")

@@ -12,7 +12,7 @@ Phase 0 全部 4 项任务已按实施计划完成文件创建与代码修改。
 
 ### Task 0.1：创建数据库表
 
-- **文件**：`batch-video-server/sql/batch_business.sql`
+- **文件**：`server/sql/batch_business.sql`
 - **内容**：包含 1.1~1.4 全部 15 张 `batch_*` 业务表的 CREATE TABLE 语句：
   1. `batch_customer`（客户/APP 账号主表）
   2. `batch_customer_relation`（上下级关系快照表）
@@ -34,7 +34,7 @@ Phase 0 全部 4 项任务已按实施计划完成文件创建与代码修改。
 
 ### Task 0.2：后端业务包脚手架
 
-- **位置**：`batch-video-server/ruoyi-system/src/main/java/com/ruoyi/batch`
+- **位置**：`server/ruoyi-system/src/main/java/com/ruoyi/batch`
 - **子包**：`customer`、`vip`、`home`、`notice`、`tutorial`、`document`、`computing`、`statistics`、`config`
 - **每个子包包含**：
   - `domain/*.java`
@@ -51,16 +51,16 @@ Phase 0 全部 4 项任务已按实施计划完成文件创建与代码修改。
 
 ### Task 0.3：扩展后台登录支持手机号
 
-- **修改文件 1**：`batch-video-server/ruoyi-system/src/main/resources/mapper/system/SysUserMapper.xml`
+- **修改文件 1**：`server/ruoyi-system/src/main/resources/mapper/system/SysUserMapper.xml`
   - `selectUserByUserName` 查询条件由 `u.user_name = #{userName}` 改为 `(u.user_name = #{userName} or u.phonenumber = #{userName})`，支持管理员使用账号或手机号登录。
-- **修改文件 2**：`batch-video-server/ruoyi-ui/src/views/login.vue`
+- **修改文件 2**：`server/ruoyi-ui/src/views/login.vue`
   - 账号输入框 `placeholder` 由 "账号" 改为 "请输入管理员账号/手机号"。
   - 表单校验提示信息同步改为 "请输入管理员账号/手机号"。
 - **说明**：`SysUserServiceImpl.selectUserByUserName` 本身仅透传 Mapper，无需额外修改。
 
 ### Task 0.4：配置后台动态菜单
 
-- **文件**：`batch-video-server/sql/batch_menu.sql`
+- **文件**：`server/sql/batch_menu.sql`
 - **内容**：
   - 1 个目录：批量剪辑管理（`menu_id=3000`，icon `el-icon-s-management`）
   - 8 个菜单：客户管理、会员VIP管理、首页内容管理、公告管理、教程管理、文档管理、数据统计、系统配置

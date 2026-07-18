@@ -2,6 +2,8 @@ package com.example.cj.videoeditor.ui.aicreation;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -37,7 +39,9 @@ import com.example.cj.videoeditor.utils.ToastUtil;
 import com.example.cj.videoeditor.utils.UserStore;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -60,6 +64,9 @@ public class AiCreationFragment extends Fragment {
     private ItemTouchHelper itemTouchHelper;
     private List<VideoGroup> allGroups = new ArrayList<>();
     private List<VideoGroup> displayGroups = new ArrayList<>();
+    private final Handler sortHandler = new Handler(Looper.getMainLooper());
+    private final Map<String, VideoGroup> pendingSortUpdates = new LinkedHashMap<>();
+    private final Runnable flushSortRunnable = this::flushSortUpdates;
 
     @Nullable
     @Override
@@ -107,6 +114,13 @@ public class AiCreationFragment extends Fragment {
         loadPower();
         refreshCustomerInfo();
         loadGroups();
+    }
+
+    @Override
+    public void onDestroyView() {
+        sortHandler.removeCallbacks(flushSortRunnable);
+        pendingSortUpdates.clear();
+        super.onDestroyView();
     }
 
     private void setupRecyclerView() {
@@ -223,6 +237,9 @@ public class AiCreationFragment extends Fragment {
         apiService.getAppCustomer(phone).enqueue(new ApiCallback<BatchCustomerDto>() {
             @Override
             public void onSuccess(BatchCustomerDto data) {
+                if (!isAdded() || getContext() == null) {
+                    return;
+                }
                 if (data != null) {
                     UserStore.saveCustomerDto(requireContext(), data);
                     loadPower();
@@ -241,6 +258,9 @@ public class AiCreationFragment extends Fragment {
         apiService.getAiVideoGroupList().enqueue(new PageApiCallback<BatchAiVideoGroupDto>() {
             @Override
             public void onSuccess(long total, List<BatchAiVideoGroupDto> rows) {
+                if (!isAdded() || getContext() == null || etSearch == null) {
+                    return;
+                }
                 showLoading(false);
                 allGroups.clear();
                 for (BatchAiVideoGroupDto dto : rows) {
@@ -252,6 +272,9 @@ public class AiCreationFragment extends Fragment {
 
             @Override
             public void onError(String msg) {
+                if (!isAdded() || getContext() == null) {
+                    return;
+                }
                 showLoading(false);
                 ToastUtil.show(requireContext(), msg);
                 updateEmptyView();
@@ -281,6 +304,9 @@ public class AiCreationFragment extends Fragment {
             apiService.deleteAiVideoGroup(groupId).enqueue(new ApiCallback<Object>() {
                 @Override
                 public void onSuccess(Object data) {
+                    if (!isAdded() || getContext() == null) {
+                        return;
+                    }
                     showLoading(false);
                     int position = displayGroups.indexOf(group);
                     displayGroups.remove(group);
@@ -295,6 +321,9 @@ public class AiCreationFragment extends Fragment {
 
                 @Override
                 public void onError(String msg) {
+                    if (!isAdded() || getContext() == null) {
+                        return;
+                    }
                     showLoading(false);
                     ToastUtil.show(requireContext(), msg);
                 }
@@ -318,8 +347,23 @@ public class AiCreationFragment extends Fragment {
                 allGroups.get(allIndex).setSortWeight(i);
             }
         }
+        // 只收集本次受影响的组，300ms 防抖合并后统一提交，避免一次拖动发 N 个串行请求
         for (int i = start; i <= end; i++) {
-            updateGroupSortWeight(displayGroups.get(i), i);
+            VideoGroup group = displayGroups.get(i);
+            pendingSortUpdates.put(group.id, group);
+        }
+        sortHandler.removeCallbacks(flushSortRunnable);
+        sortHandler.postDelayed(flushSortRunnable, 300);
+    }
+
+    private void flushSortUpdates() {
+        if (pendingSortUpdates.isEmpty()) {
+            return;
+        }
+        List<VideoGroup> snapshot = new ArrayList<>(pendingSortUpdates.values());
+        pendingSortUpdates.clear();
+        for (VideoGroup group : snapshot) {
+            updateGroupSortWeight(group, group.getSortWeight());
         }
     }
 
@@ -337,11 +381,16 @@ public class AiCreationFragment extends Fragment {
 
                 @Override
                 public void onError(String msg) {
+                    if (!isAdded() || getContext() == null) {
+                        return;
+                    }
                     ToastUtil.show(requireContext(), msg);
                 }
             });
         } catch (NumberFormatException e) {
-            ToastUtil.show(requireContext(), "视频组 ID 异常");
+            if (isAdded() && getContext() != null) {
+                ToastUtil.show(requireContext(), "视频组 ID 异常");
+            }
         }
     }
 
@@ -390,6 +439,9 @@ public class AiCreationFragment extends Fragment {
         apiService.addAiVideoGroup(dto).enqueue(new ApiCallback<BatchAiVideoGroupCreateResultDto>() {
             @Override
             public void onSuccess(BatchAiVideoGroupCreateResultDto data) {
+                if (!isAdded() || getContext() == null || etSearch == null) {
+                    return;
+                }
                 showLoading(false);
                 Long groupId = data != null && data.getGroupId() != null ? data.getGroupId() : 0L;
                 String date = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
@@ -402,6 +454,9 @@ public class AiCreationFragment extends Fragment {
 
             @Override
             public void onError(String msg) {
+                if (!isAdded() || getContext() == null) {
+                    return;
+                }
                 showLoading(false);
                 ToastUtil.show(requireContext(), msg);
             }

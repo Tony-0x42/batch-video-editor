@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import javax.imageio.ImageIO;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,7 +17,6 @@ import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.ruoyi.common.config.RuoYiConfig;
-import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.file.FileUploadUtils;
 
 /**
@@ -29,9 +27,12 @@ import com.ruoyi.common.utils.file.FileUploadUtils;
 @Component
 public class QrCodeUtil
 {
-    /** APP 下载页基础 URL，二维码中将附带 invitePhone 参数 */
-    @Value("${batch.app.downloadUrl:https://batchvideo.example.com/download}")
-    private String appDownloadUrl;
+    /** 扫码统计回调路径，扫码后计入统计并 302 跳转到 APP 下载地址 */
+    private static final String SCAN_PATH = "/batch/qrcode/scan?phone=";
+
+    /** 服务对外访问地址（域名+端口），用于拼接二维码内容URL与图片访问URL */
+    @Value("${batch.app.server-url:http://localhost:8080}")
+    private String serverUrl;
 
     /**
      * 生成带邀请手机号的注册二维码并上传到文件服务器
@@ -56,35 +57,19 @@ public class QrCodeUtil
     }
 
     /**
-     * 获取当前服务访问地址（域名+端口+上下文路径）
+     * 获取服务对外访问地址（配置项 batch.app.server-url）
      */
-    private String getServerUrl()
+    public String getServerUrl()
     {
-        HttpServletRequest request = ServletUtils.getRequest();
-        if (request == null)
-        {
-            return "";
-        }
-        StringBuffer url = request.getRequestURL();
-        String contextPath = request.getServletContext().getContextPath();
-        return url.delete(url.length() - request.getRequestURI().length(), url.length()).append(contextPath).toString();
+        return serverUrl;
     }
 
     /**
-     * 构建二维码内容
+     * 构建二维码内容：指向扫码统计接口，扫码后由服务端统计并跳转下载地址
      */
     public String buildQrContent(String phone)
     {
-        String baseUrl = appDownloadUrl;
-        if (!baseUrl.contains("?"))
-        {
-            baseUrl = baseUrl + "?invitePhone=" + phone;
-        }
-        else
-        {
-            baseUrl = baseUrl + "&invitePhone=" + phone;
-        }
-        return baseUrl;
+        return getServerUrl() + SCAN_PATH + phone;
     }
 
     /**

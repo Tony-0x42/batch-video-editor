@@ -4,9 +4,65 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.batch.aivideo.mapper.BatchAiVideoGenerateLogMapper">
 
+    <resultMap type="com.ruoyi.batch.aivideo.domain.BatchAiVideoGenerateLog" id="BatchAiVideoGenerateLogResult">
+        <id     property="logId"          column="log_id"           />
+        <result property="phone"          column="phone"            />
+        <result property="groupId"        column="group_id"         />
+        <result property="videoGroupName" column="video_group_name" />
+        <result property="generateCount"  column="generate_count"   />
+        <result property="consumeValue"   column="consume_value"    />
+        <result property="status"         column="status"           />
+        <result property="progress"       column="progress"         />
+        <result property="resultUrl"      column="result_url"       />
+        <result property="errorMsg"       column="error_msg"        />
+        <result property="clipSeed"       column="clip_seed"        />
+        <result property="createTime"     column="create_time"      />
+    </resultMap>
+
+    <sql id="selectBatchAiVideoGenerateLogVo">
+        select log_id, phone, group_id, video_group_name, generate_count, consume_value,
+               status, progress, result_url, error_msg, clip_seed, create_time
+        from batch_video_generate_log
+    </sql>
+
+    <select id="selectBatchAiVideoGenerateLogList" parameterType="com.ruoyi.batch.aivideo.domain.BatchAiVideoGenerateLog" resultMap="BatchAiVideoGenerateLogResult">
+        <include refid="selectBatchAiVideoGenerateLogVo"/>
+        <where>
+            <if test="phone != null and phone != ''"> and phone = #{phone} </if>
+            <if test="groupId != null"> and group_id = #{groupId} </if>
+            <if test="status != null"> and status = #{status} </if>
+            <if test="params.beginTime != null and params.beginTime != ''">
+                and date_format(create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''">
+                and date_format(create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+            </if>
+        </where>
+        order by create_time desc, log_id desc
+    </select>
+
+    <select id="selectBatchAiVideoGenerateLogById" parameterType="Long" resultMap="BatchAiVideoGenerateLogResult">
+        <include refid="selectBatchAiVideoGenerateLogVo"/>
+        where log_id = #{logId}
+    </select>
+
     <insert id="insertBatchAiVideoGenerateLog" parameterType="com.ruoyi.batch.aivideo.domain.BatchAiVideoGenerateLog" useGeneratedKeys="true" keyProperty="logId">
-        insert into batch_video_generate_log (phone, video_group_name, generate_count, status, create_time)
-        values (#{phone}, #{videoGroupName}, #{generateCount}, #{status}, #{createTime})
+        insert into batch_video_generate_log
+            (phone, group_id, video_group_name, generate_count, consume_value, status, progress, clip_seed, create_time)
+        values
+            (#{phone}, #{groupId}, #{videoGroupName}, #{generateCount}, #{consumeValue}, #{status}, #{progress}, #{clipSeed}, #{createTime})
     </insert>
+
+    <update id="updateBatchAiVideoGenerateLog" parameterType="com.ruoyi.batch.aivideo.domain.BatchAiVideoGenerateLog">
+        update batch_video_generate_log
+        <set>
+            <if test="status != null">status = #{status},</if>
+            <if test="progress != null">progress = #{progress},</if>
+            <if test="resultUrl != null">result_url = #{resultUrl},</if>
+            <if test="errorMsg != null">error_msg = #{errorMsg},</if>
+            <if test="clipSeed != null">clip_seed = #{clipSeed},</if>
+        </set>
+        where log_id = #{logId}
+    </update>
 
 </mapper>

@@ -23,8 +23,8 @@
 ## Task 1: LearningActivity 对接 `/batch/tutorial/list`
 
 **Files:**
-- Modify: `batch-video-editor/app/src/main/java/com/example/cj/videoeditor/activity/LearningActivity.java`
-- Modify: `batch-video-editor/app/src/main/res/layout/activity_learning.xml`
+- Modify: `android/app/src/main/java/com/example/cj/videoeditor/activity/LearningActivity.java`
+- Modify: `android/app/src/main/res/layout/activity_learning.xml`
 
 **Interfaces:**
 - Consumes: `ApiService.getTutorialList()` → `PageResponse<BatchTutorialDto>`
@@ -118,8 +118,8 @@ Run: `./gradlew :app:compileDebugJavaWithJavac :app:compileDebugKotlin`
 ## Task 2: DocumentActivity 对接 `/batch/document/list`
 
 **Files:**
-- Modify: `batch-video-editor/app/src/main/java/com/example/cj/videoeditor/activity/DocumentActivity.java`
-- Modify: `batch-video-editor/app/src/main/res/layout/activity_document.xml`
+- Modify: `android/app/src/main/java/com/example/cj/videoeditor/activity/DocumentActivity.java`
+- Modify: `android/app/src/main/res/layout/activity_document.xml`
 
 **Interfaces:**
 - Consumes: `ApiService.getDocumentList()` → `PageResponse<BatchDocumentDto>`
@@ -196,8 +196,8 @@ private String normalizeCategory(String applyPages) {
 ## Task 3: BrandActivity 对接 `/batch/config/brand`
 
 **Files:**
-- Modify: `batch-video-editor/app/src/main/java/com/example/cj/videoeditor/activity/BrandActivity.java`
-- Modify: `batch-video-editor/app/src/main/res/layout/activity_brand.xml`
+- Modify: `android/app/src/main/java/com/example/cj/videoeditor/activity/BrandActivity.java`
+- Modify: `android/app/src/main/res/layout/activity_brand.xml`
 
 **Interfaces:**
 - Consumes: `ApiService.getBrandConfig()` → `BaseResponse<Map<String, Object>>`
@@ -281,19 +281,19 @@ private String toString(Object value) {
 ## Task 4: 后端新增客服联系模块并对接 ContactActivity
 
 **Files (Backend):**
-- Create: `batch-video-server/ruoyi-system/src/main/java/com/ruoyi/batch/contact/domain/BatchContact.java`
-- Create: `batch-video-server/ruoyi-system/src/main/java/com/ruoyi/batch/contact/mapper/BatchContactMapper.java`
-- Create: `batch-video-server/ruoyi-system/src/main/resources/mapper/batch/contact/BatchContactMapper.xml`
-- Create: `batch-video-server/ruoyi-system/src/main/java/com/ruoyi/batch/contact/service/IBatchContactService.java`
-- Create: `batch-video-server/ruoyi-system/src/main/java/com/ruoyi/batch/contact/service/impl/BatchContactServiceImpl.java`
-- Create: `batch-video-server/ruoyi-system/src/main/java/com/ruoyi/batch/contact/controller/BatchContactController.java`
-- Modify: `batch-video-server/sql/batch_business.sql`
+- Create: `server/ruoyi-system/src/main/java/com/ruoyi/batch/contact/domain/BatchContact.java`
+- Create: `server/ruoyi-system/src/main/java/com/ruoyi/batch/contact/mapper/BatchContactMapper.java`
+- Create: `server/ruoyi-system/src/main/resources/mapper/batch/contact/BatchContactMapper.xml`
+- Create: `server/ruoyi-system/src/main/java/com/ruoyi/batch/contact/service/IBatchContactService.java`
+- Create: `server/ruoyi-system/src/main/java/com/ruoyi/batch/contact/service/impl/BatchContactServiceImpl.java`
+- Create: `server/ruoyi-system/src/main/java/com/ruoyi/batch/contact/controller/BatchContactController.java`
+- Modify: `server/sql/batch_business.sql`
 
 **Files (APP):**
-- Modify: `batch-video-editor/app/src/main/java/com/example/cj/videoeditor/network/ApiService.java`
-- Create: `batch-video-editor/app/src/main/java/com/example/cj/videoeditor/network/dto/BatchContactDto.java`
-- Modify: `batch-video-editor/app/src/main/java/com/example/cj/videoeditor/activity/ContactActivity.java`
-- Modify: `batch-video-editor/app/src/main/res/layout/activity_contact.xml`
+- Modify: `android/app/src/main/java/com/example/cj/videoeditor/network/ApiService.java`
+- Create: `android/app/src/main/java/com/example/cj/videoeditor/network/dto/BatchContactDto.java`
+- Modify: `android/app/src/main/java/com/example/cj/videoeditor/activity/ContactActivity.java`
+- Modify: `android/app/src/main/res/layout/activity_contact.xml`
 
 **Interfaces:**
 - Backend produces: `GET /batch/contact/list` → `AjaxResult` with `{ onlinePhone, headquarterPhone, contacts: [...] }`
@@ -301,7 +301,7 @@ private String toString(Object value) {
 
 - [ ] **Step 1: Add SQL table**
 
-Append to `batch-video-server/sql/batch_business.sql`:
+Append to `server/sql/batch_business.sql`:
 
 ```sql
 -- APP 客服联系表
@@ -508,7 +508,7 @@ private void loadContacts() {
 ## Task 5: AgreementActivity 对接 `/batch/document/list`
 
 **Files:**
-- Modify: `batch-video-editor/app/src/main/java/com/example/cj/videoeditor/activity/AgreementActivity.java`
+- Modify: `android/app/src/main/java/com/example/cj/videoeditor/activity/AgreementActivity.java`
 
 **Interfaces:**
 - Consumes: `ApiService.getDocumentList()` → `PageResponse<BatchDocumentDto>`
@@ -569,7 +569,7 @@ private String findAgreementContent(List<BatchDocumentDto> list) {
 ## Task 6: LoginActivity 对接 `/batch/app/login`
 
 **Files:**
-- Modify: `batch-video-editor/app/src/main/java/com/example/cj/videoeditor/activity/LoginActivity.java`
+- Modify: `android/app/src/main/java/com/example/cj/videoeditor/activity/LoginActivity.java`
 
 **Interfaces:**
 - Consumes: `ApiService.appLogin(AppLoginBody)` → `BaseResponse<BatchCustomerDto>`
@@ -626,7 +626,7 @@ private void login(String phone, String password) {
 ## Task 7: RegisterActivity 对接 `/batch/app/register`
 
 **Files:**
-- Modify: `batch-video-editor/app/src/main/java/com/example/cj/videoeditor/activity/RegisterActivity.java`
+- Modify: `android/app/src/main/java/com/example/cj/videoeditor/activity/RegisterActivity.java`
 
 **Interfaces:**
 - Consumes: `ApiService.appRegister(AppRegisterBody)` → `BaseResponse<BatchCustomerDto>`
@@ -679,13 +679,13 @@ private void register(String phone, String password) {
 
 - [ ] **Step 1: 全局 MockDataProvider 调用扫描**
 
-Run: `grep -R "MockDataProvider" batch-video-editor/app/src/main/java/com/example/cj/videoeditor/activity/`
+Run: `grep -R "MockDataProvider" android/app/src/main/java/com/example/cj/videoeditor/activity/`
 
 Expected: only `CustomerServiceActivity.java`, `EditProfileActivity.java`, `PrivacyActivity.java` (非本次目标页) 仍可保留；5 个目标页 + Login/Register 不再引用。
 
 - [ ] **Step 2: 后端编译**
 
-Run: `D:/tools/bin/mvn.cmd -f batch-video-server/pom.xml -pl ruoyi-system -am clean compile`
+Run: `D:/tools/bin/mvn.cmd -f server/pom.xml -pl ruoyi-system -am clean compile`
 Expected: BUILD SUCCESS
 
 - [ ] **Step 3: APP 编译**

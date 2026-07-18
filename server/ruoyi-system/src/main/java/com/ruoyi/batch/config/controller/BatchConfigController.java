@@ -63,6 +63,24 @@ public class BatchConfigController extends BaseController
         "batch.global.customerServiceHours"
     };
 
+    /** 全局参数默认值：单次生成视频数量上限 */
+    private static final int DEFAULT_MAX_VIDEOS = 10;
+
+    /** 全局参数默认值：切片时长下限（秒） */
+    private static final double DEFAULT_SLICE_MIN = 0.5;
+
+    /** 全局参数默认值：切片时长上限（秒） */
+    private static final double DEFAULT_SLICE_MAX = 10.0;
+
+    /** 全局参数默认值：切片时长步长（秒） */
+    private static final double DEFAULT_SLICE_STEP = 0.1;
+
+    /** 全局参数默认值：算力耗尽提示文案 */
+    private static final String DEFAULT_COMPUTING_EMPTY_TIP = "当前算力已耗尽，请联系管理员增加算力额度";
+
+    /** 全局参数默认值：链接解析失败提示文案 */
+    private static final String DEFAULT_PARSE_FAIL_TIP = "链接解析失败，请检查链接是否有效";
+
     /**
      * 查询品牌配置
      */
@@ -119,7 +137,7 @@ public class BatchConfigController extends BaseController
                 }
                 catch (NumberFormatException e)
                 {
-                    result.put(shortKey, "maxVideos".equals(shortKey) ? 10 : ("sliceMin".equals(shortKey) ? 0.5 : ("sliceMax".equals(shortKey) ? 10.0 : 0.1)));
+                    result.put(shortKey, defaultNumberValue(shortKey));
                 }
             }
             else
@@ -131,6 +149,24 @@ public class BatchConfigController extends BaseController
     }
 
     /**
+     * 数值型全局参数的默认值
+     */
+    private Object defaultNumberValue(String shortKey)
+    {
+        switch (shortKey)
+        {
+            case "maxVideos":
+                return DEFAULT_MAX_VIDEOS;
+            case "sliceMin":
+                return DEFAULT_SLICE_MIN;
+            case "sliceMax":
+                return DEFAULT_SLICE_MAX;
+            default:
+                return DEFAULT_SLICE_STEP;
+        }
+    }
+
+    /**
      * 保存全局参数
      */
     @PreAuthorize("@ss.hasPermi('batch:config:edit')")
@@ -138,15 +174,13 @@ public class BatchConfigController extends BaseController
     @PostMapping("/global")
     public AjaxResult saveGlobalConfig(@RequestBody Map<String, Object> form)
     {
+        Map<String, String> defaults = defaultGlobalConfigMap();
         Map<String, String> configMap = new HashMap<>();
-        configMap.put("batch.ai.maxVideos", String.valueOf(form.getOrDefault("maxVideos", "10")));
-        configMap.put("batch.ai.sliceMin", String.valueOf(form.getOrDefault("sliceMin", "0.5")));
-        configMap.put("batch.ai.sliceMax", String.valueOf(form.getOrDefault("sliceMax", "10")));
-        configMap.put("batch.ai.sliceStep", String.valueOf(form.getOrDefault("sliceStep", "0.1")));
-        configMap.put("batch.computing.emptyTip", String.valueOf(form.getOrDefault("emptyTip", "当前算力已耗尽，请联系管理员增加算力额度")));
-        configMap.put("batch.link.parseFailTip", String.valueOf(form.getOrDefault("parseFailTip", "链接解析失败，请检查链接是否有效")));
-        configMap.put("batch.global.emptyPlaceholder", String.valueOf(form.getOrDefault("emptyPlaceholder", "")));
-        configMap.put("batch.global.customerServiceHours", String.valueOf(form.getOrDefault("customerServiceHours", "")));
+        for (String key : GLOBAL_CONFIG_KEYS)
+        {
+            String shortKey = key.substring(key.lastIndexOf(".") + 1);
+            configMap.put(key, String.valueOf(form.getOrDefault(shortKey, defaults.get(key))));
+        }
         return toAjax(configService.saveConfigGroup("global", configMap, getUsername()));
     }
 
@@ -158,16 +192,24 @@ public class BatchConfigController extends BaseController
     @PostMapping("/initGlobal")
     public AjaxResult initGlobalConfig()
     {
+        return toAjax(configService.saveConfigGroup("global", defaultGlobalConfigMap(), getUsername()));
+    }
+
+    /**
+     * 全局参数默认值映射
+     */
+    private Map<String, String> defaultGlobalConfigMap()
+    {
         Map<String, String> configMap = new HashMap<>();
-        configMap.put("batch.ai.maxVideos", "10");
-        configMap.put("batch.ai.sliceMin", "0.5");
-        configMap.put("batch.ai.sliceMax", "10");
-        configMap.put("batch.ai.sliceStep", "0.1");
-        configMap.put("batch.computing.emptyTip", "当前算力已耗尽，请联系管理员增加算力额度");
-        configMap.put("batch.link.parseFailTip", "链接解析失败，请检查链接是否有效");
+        configMap.put("batch.ai.maxVideos", String.valueOf(DEFAULT_MAX_VIDEOS));
+        configMap.put("batch.ai.sliceMin", String.valueOf(DEFAULT_SLICE_MIN));
+        configMap.put("batch.ai.sliceMax", String.valueOf(DEFAULT_SLICE_MAX));
+        configMap.put("batch.ai.sliceStep", String.valueOf(DEFAULT_SLICE_STEP));
+        configMap.put("batch.computing.emptyTip", DEFAULT_COMPUTING_EMPTY_TIP);
+        configMap.put("batch.link.parseFailTip", DEFAULT_PARSE_FAIL_TIP);
         configMap.put("batch.global.emptyPlaceholder", "");
         configMap.put("batch.global.customerServiceHours", "");
-        return toAjax(configService.saveConfigGroup("global", configMap, getUsername()));
+        return configMap;
     }
 
     /**

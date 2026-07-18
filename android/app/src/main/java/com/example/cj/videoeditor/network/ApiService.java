@@ -10,7 +10,7 @@ import retrofit2.Call;
 import retrofit2.http.*;
 
 /**
- * batch-video-server 后端 API 接口定义。
+ * batch-video-editor 后端 API 接口定义。
  *
  * 所有需要认证的接口会自动携带 [Authorization: Bearer &lt;token&gt;]（由 TokenInterceptor 处理）。
  */
@@ -305,6 +305,32 @@ public interface ApiService {
 
     @POST("batch/ai/video/generate")
     Call<BaseResponse<BatchAiVideoGenerateResultDto>> generateAiVideo(@Body BatchAiVideoGenerateBody body);
+
+    /**
+     * 上传素材视频，返回 data.url。
+     */
+    @Multipart
+    @POST("batch/ai/video/upload")
+    Call<BaseResponse<Map<String, Object>>> uploadAiVideo(@Part MultipartBody.Part file);
+
+    /**
+     * 按切片时长把素材切成多个分镜头，body: {groupId, videoUrl, sliceDuration}。
+     */
+    @POST("batch/ai/video/split")
+    Call<BaseResponse<List<BatchAiVideoClipDto>>> splitAiVideo(@Body Map<String, Object> body);
+
+    /**
+     * 异步批量生成视频，body: {groupId, count}。
+     */
+    @POST("batch/ai/video/generate")
+    Call<BaseResponse<Object>> submitAiVideoGenerate(@Body Map<String, Object> body);
+
+    /**
+     * 查询某视频组的生成任务列表：[{logId,status,progress,resultUrl,errorMsg,createTime}]，
+     * status: 0=处理中 1=成功 2=失败。
+     */
+    @GET("batch/ai/video/task/list")
+    Call<BaseResponse<List<Map<String, Object>>>> getAiVideoTaskList(@Query("groupId") Long groupId);
 
     // ==================== 算力 ====================
 

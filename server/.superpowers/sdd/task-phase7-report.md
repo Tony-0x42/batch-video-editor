@@ -5,7 +5,7 @@
 **状态**：已完成  
 **Commit SHA**：`8fd1a84`  
 **分支**：`main`  
-**Remote**：https://github.com/Tony-0x42/batch-video-server.git  
+**Remote**：https://github.com/Tony-0x42/batch-video-editor.git  
 **提交信息**：`feat(Phase 7: 数据统计模块): 实现数据统计后端接口与前端页面`
 
 ---

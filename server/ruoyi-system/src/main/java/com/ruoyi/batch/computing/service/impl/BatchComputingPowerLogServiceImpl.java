@@ -1,7 +1,6 @@
 package com.ruoyi.batch.computing.service.impl;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,13 +14,16 @@ import com.ruoyi.batch.customer.domain.BatchCustomer;
 import com.ruoyi.batch.customer.mapper.BatchCustomerMapper;
 
 /**
- * computing业务模块Service业务层处理占位
+ * 算力消耗日志Service业务层处理
  *
  * @author ruoyi
  */
 @Service
 public class BatchComputingPowerLogServiceImpl implements IBatchComputingPowerLogService
 {
+    /** 操作类型：1 生成 */
+    private static final int OPERATION_TYPE_GENERATE = 1;
+
     @Autowired
     private BatchComputingPowerLogMapper batchComputingPowerLogMapper;
 
@@ -43,30 +45,21 @@ public class BatchComputingPowerLogServiceImpl implements IBatchComputingPowerLo
             throw new ServiceException("消耗算力值必须大于 0");
         }
 
-        BatchCustomer customer = batchCustomerMapper.selectBatchCustomerByPhone(phone);
-        if (customer == null)
+        // 原子扣减：单条带条件 UPDATE，余额不足时影响行数为 0，不记录日志
+        int rows = batchCustomerMapper.consumeComputingPowerByPhone(phone, consumeValue);
+        if (rows == 0)
         {
-            throw new ServiceException("账号不存在");
-        }
-
-        BigDecimal total = customer.getComputingPowerTotal() != null ? customer.getComputingPowerTotal() : BigDecimal.ZERO;
-        BigDecimal used = customer.getComputingPowerUsed() != null ? customer.getComputingPowerUsed() : BigDecimal.ZERO;
-        BigDecimal remain = total.subtract(used);
-
-        if (remain.compareTo(consumeValue) < 0)
-        {
+            BatchCustomer customer = batchCustomerMapper.selectBatchCustomerByPhone(phone);
+            if (customer == null)
+            {
+                throw new ServiceException("账号不存在");
+            }
             throw new ServiceException("当前算力已耗尽，请联系管理员增加算力额度");
         }
 
-        BigDecimal newUsed = used.add(consumeValue);
-        BigDecimal newRemain = total.subtract(newUsed);
-
-        BatchCustomer update = new BatchCustomer();
-        update.setCustomerId(customer.getCustomerId());
-        update.setComputingPowerUsed(newUsed);
-        update.setComputingPowerRemain(newRemain);
-        update.setUpdateTime(DateUtils.getNowDate());
-        batchCustomerMapper.updateBatchCustomer(update);
+        BatchCustomer customer = batchCustomerMapper.selectBatchCustomerByPhone(phone);
+        BigDecimal newRemain = customer.getComputingPowerRemain() != null
+                ? customer.getComputingPowerRemain() : BigDecimal.ZERO;
 
         BatchComputingPowerLog log = new BatchComputingPowerLog();
         log.setPhone(phone);
@@ -78,5 +71,12 @@ public class BatchComputingPowerLogServiceImpl implements IBatchComputingPowerLo
         batchComputingPowerLogMapper.insert(log);
 
         return newRemain;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public BigDecimal consumeComputingPower(String phone, BigDecimal consumeValue, String remark)
+    {
+        return consumeComputingPower(phone, OPERATION_TYPE_GENERATE, consumeValue, remark);
     }
 }

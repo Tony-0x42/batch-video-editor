@@ -8,7 +8,7 @@
 
 ## 1. 项目背景与目标
 
-`batch-video-editor/batch-video-editor/` 目录当前完全空白，需要从零构建一个完整可用的 Android APP。APP 面向品牌方、经销商及个人用户，核心功能包括：手机号密码登录/注册、首页品牌与内容展示、AI 短视频创作、AI 去水印、个人中心。
+`android/android/` 目录当前完全空白，需要从零构建一个完整可用的 Android APP。APP 面向品牌方、经销商及个人用户，核心功能包括：手机号密码登录/注册、首页品牌与内容展示、AI 短视频创作、AI 去水印、个人中心。
 
 **成功标准**：
 - APP 能在已连接的 Android 真机上安装、启动、运行；
@@ -50,7 +50,7 @@
 ## 4. 工程结构
 
 ```
-batch-video-editor/
+android/
 ├── app/
 │   ├── build.gradle.kts
 │   ├── src/main/
@@ -288,7 +288,7 @@ Data Source
 
 ## 11. 待后续迭代
 
-- 接入真实 batch-video-server 后端 API；
+- 接入真实 server 后端 API；
 - 替换 Mock 的 AI 分割、配音、去水印解析服务；
 - 实现完整时间线渲染与导出引擎；
 - 相机录制与高级滤镜；

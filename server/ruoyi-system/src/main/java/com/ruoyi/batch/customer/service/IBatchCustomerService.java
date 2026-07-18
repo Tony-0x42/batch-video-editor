@@ -47,6 +47,9 @@ public interface IBatchCustomerService
 
     /**
      * 新增客户
+     * <p>
+     * 未传入密码时自动设置初始密码（配置项 batch.app.default-password，默认 123456），
+     * 密码统一以 BCrypt 加密入库，新增后客户可直接使用该密码登录 APP。
      *
      * @param batchCustomer 客户信息
      * @return 影响行数

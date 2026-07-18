@@ -78,9 +78,10 @@
           <el-button size="mini" type="text" icon="el-icon-view" @click="handleView(scope.row)" v-hasPermi="['batch:customer:query']">查看</el-button>
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)" v-hasPermi="['batch:customer:edit']">编辑</el-button>
           <el-button size="mini" type="text" icon="el-icon-picture-outline" @click="handleQrCode(scope.row)" v-hasPermi="['batch:customer:resetQr']">二维码</el-button>
-          <el-dropdown size="mini" @command="(command) => handleCommand(command, scope.row)" v-hasPermi="['batch:customer:upgrade', 'batch:customer:migrate', 'batch:customer:remove']">
+          <el-dropdown size="mini" @command="(command) => handleCommand(command, scope.row)" v-hasPermi="['batch:customer:upgrade', 'batch:customer:migrate', 'batch:customer:edit', 'batch:customer:remove']">
             <el-button size="mini" type="text" icon="el-icon-d-arrow-right">更多</el-button>
             <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item command="handleResetPassword" icon="el-icon-key" v-hasPermi="['batch:customer:edit']">重置密码</el-dropdown-item>
               <el-dropdown-item command="handleUpgrade" icon="el-icon-top" v-hasPermi="['batch:customer:upgrade']" v-if="scope.row.customerType !== 1">升级</el-dropdown-item>
               <el-dropdown-item command="handleMigrate" icon="el-icon-rank" v-hasPermi="['batch:customer:migrate']" v-if="scope.row.customerType !== 1">迁移</el-dropdown-item>
               <el-dropdown-item command="handleDelete" icon="el-icon-delete" v-hasPermi="['batch:customer:remove']">删除</el-dropdown-item>
@@ -95,6 +96,25 @@
     <customer-upgrade-dialog ref="upgradeDialogRef" @success="getList" />
     <!-- 迁移弹窗 -->
     <customer-migrate-dialog ref="migrateDialogRef" @success="getList" />
+
+    <!-- 重置密码弹窗 -->
+    <el-dialog title="重置密码" :visible.sync="resetPwdOpen" width="450px" append-to-body :close-on-click-modal="false">
+      <el-form ref="resetPwdForm" :model="resetPwdForm" :rules="resetPwdRules" label-width="90px">
+        <el-form-item label="客户">
+          <span>{{ resetPwdForm.customerName }}（{{ resetPwdForm.phone }}）</span>
+        </el-form-item>
+        <el-form-item label="新密码" prop="password">
+          <el-input v-model="resetPwdForm.password" type="password" show-password placeholder="请输入新密码（6-20位）" maxlength="20" />
+        </el-form-item>
+        <el-form-item label="确认密码" prop="confirmPassword">
+          <el-input v-model="resetPwdForm.confirmPassword" type="password" show-password placeholder="请再次输入新密码" maxlength="20" />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" :loading="resetPwdLoading" @click="submitResetPassword">确 定</el-button>
+        <el-button @click="resetPwdOpen = false">取 消</el-button>
+      </div>
+    </el-dialog>
 
     <!-- 导入弹窗 -->
     <el-dialog title="导入客户" :visible.sync="importOpen" width="450px" append-to-body :close-on-click-modal="false">
@@ -133,7 +153,7 @@
 </template>
 
 <script>
-import { listCustomer, delCustomer, changeCustomerStatus, exportCustomer, importData } from "@/api/batch/customer"
+import { listCustomer, delCustomer, changeCustomerStatus, exportCustomer, importData, resetCustomerPassword } from "@/api/batch/customer"
 import CustomerUpgradeDialog from "./upgrade"
 import CustomerMigrateDialog from "./migrate"
 import { checkPermi } from "@/utils/permission"
@@ -189,7 +209,36 @@ export default {
         failList: []
       },
       importFile: null,
-      failListOpen: false
+      failListOpen: false,
+      // 重置密码相关
+      resetPwdOpen: false,
+      resetPwdLoading: false,
+      resetPwdForm: {
+        customerId: undefined,
+        customerName: "",
+        phone: "",
+        password: "",
+        confirmPassword: ""
+      },
+      resetPwdRules: {
+        password: [
+          { required: true, message: "新密码不能为空", trigger: "blur" },
+          { min: 6, max: 20, message: "密码长度必须在 6-20 位之间", trigger: "blur" }
+        ],
+        confirmPassword: [
+          { required: true, message: "请再次输入新密码", trigger: "blur" },
+          {
+            validator: (rule, value, callback) => {
+              if (value !== this.resetPwdForm.password) {
+                callback(new Error("两次输入的密码不一致"))
+              } else {
+                callback()
+              }
+            },
+            trigger: "blur"
+          }
+        ]
+      }
     }
   },
   created() {
@@ -225,6 +274,9 @@ export default {
     // 更多操作触发
     handleCommand(command, row) {
       switch (command) {
+        case "handleResetPassword":
+          this.handleResetPassword(row)
+          break
         case "handleUpgrade":
           this.handleUpgrade(row)
           break
@@ -272,6 +324,33 @@ export default {
     /** 迁移按钮操作 */
     handleMigrate(row) {
       this.$refs.migrateDialogRef.open(row)
+    },
+    /** 重置密码按钮操作 */
+    handleResetPassword(row) {
+      this.resetPwdForm = {
+        customerId: row.customerId,
+        customerName: row.customerName,
+        phone: row.phone,
+        password: "",
+        confirmPassword: ""
+      }
+      this.resetPwdOpen = true
+      this.$nextTick(() => {
+        this.$refs.resetPwdForm && this.$refs.resetPwdForm.clearValidate()
+      })
+    },
+    /** 提交重置密码 */
+    submitResetPassword() {
+      this.$refs.resetPwdForm.validate(valid => {
+        if (!valid) return
+        this.resetPwdLoading = true
+        resetCustomerPassword(this.resetPwdForm.customerId, this.resetPwdForm.password).then(() => {
+          this.$modal.msgSuccess("重置密码成功")
+          this.resetPwdOpen = false
+        }).finally(() => {
+          this.resetPwdLoading = false
+        })
+      })
     },
     /** 删除按钮操作 */
     handleDelete(row) {

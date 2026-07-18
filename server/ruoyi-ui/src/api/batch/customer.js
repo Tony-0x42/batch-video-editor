@@ -73,10 +73,40 @@ export function resetCustomerQrCode(customerId) {
   })
 }
 
+// 查询二维码推广累计统计
+export function getCustomerQrCodeStat(customerId) {
+  return request({
+    url: '/batch/customer/qrCode/stat/' + customerId,
+    method: 'get'
+  })
+}
+
+// 下载注册二维码（后端记录下载次数后重定向到图片，axios 自动跟随 302）
+export function downloadCustomerQrCode(customerId) {
+  return request({
+    url: '/batch/customer/qrCode/download/' + customerId,
+    method: 'get',
+    responseType: 'blob'
+  })
+}
+
 // 账号升级
 export function upgradeCustomer(customerId, data) {
   return request({
     url: '/batch/customer/upgrade/' + customerId,
+    method: 'put',
+    data: data
+  })
+}
+
+// 重置客户密码
+export function resetCustomerPassword(customerId, password) {
+  const data = {
+    customerId,
+    password
+  }
+  return request({
+    url: '/batch/customer/resetPassword',
     method: 'put',
     data: data
   })

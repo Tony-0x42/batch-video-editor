@@ -13,6 +13,11 @@ public abstract class PageApiCallback<T> implements Callback<PageResponse<T>> {
 
     @Override
     public void onResponse(Call<PageResponse<T>> call, Response<PageResponse<T>> response) {
+        Integer bizCode = response.body() != null ? response.body().getCode() : null;
+        if (SessionExpiredHandler.isSessionExpired(response.code(), bizCode)) {
+            SessionExpiredHandler.handleSessionExpired();
+            return;
+        }
         if (response.isSuccessful() && response.body() != null) {
             PageResponse<T> body = response.body();
             if (body.isSuccess()) {

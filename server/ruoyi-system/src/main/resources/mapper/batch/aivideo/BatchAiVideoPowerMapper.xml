@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.batch.aivideo.mapper.BatchAiVideoPowerMapper">
+
+    <update id="refundComputingPower">
+        update batch_customer
+        set computing_power_used = computing_power_used - #{value},
+            computing_power_remain = computing_power_remain + #{value},
+            update_time = sysdate()
+        where phone = #{phone}
+    </update>
+
+    <insert id="insertPowerLog">
+        insert into batch_computing_power_log
+            (phone, operation_type, consume_value, remain_value, video_group_name, create_time)
+        values
+            (#{phone}, #{operationType}, #{consumeValue}, #{remainValue}, #{remark}, sysdate())
+    </insert>
+
+</mapper>

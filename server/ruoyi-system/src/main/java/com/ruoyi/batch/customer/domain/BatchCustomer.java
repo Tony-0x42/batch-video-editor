@@ -91,8 +91,12 @@ public class BatchCustomer extends BaseEntity
     @Excel(name = "VIP有效期", width = 30, dateFormat = "yyyy-MM-dd")
     private Date vipExpireDate;
 
+    /** 头像地址 */
+    private String avatarUrl;
+
     /** 注册二维码图片 URL */
     private String qrCodeUrl;
+
 
     /** 二维码唯一 key */
     private String qrCodeKey;
@@ -261,6 +265,16 @@ public class BatchCustomer extends BaseEntity
     public void setVipExpireDate(Date vipExpireDate)
     {
         this.vipExpireDate = vipExpireDate;
+    }
+
+    public String getAvatarUrl()
+    {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl)
+    {
+        this.avatarUrl = avatarUrl;
     }
 
     public String getQrCodeUrl()

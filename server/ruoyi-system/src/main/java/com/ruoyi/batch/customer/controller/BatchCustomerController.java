@@ -1,5 +1,6 @@
 package com.ruoyi.batch.customer.controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import jakarta.servlet.http.HttpServletResponse;
@@ -27,6 +28,7 @@ import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.batch.customer.domain.BatchCustomer;
 import com.ruoyi.batch.customer.domain.BatchCustomerImportResult;
 import com.ruoyi.batch.customer.service.IBatchCustomerService;
+import com.ruoyi.batch.customer.service.IBatchQrCodeStatService;
 
 /**
  * 客户/APP账号管理
@@ -39,6 +41,9 @@ public class BatchCustomerController extends BaseController
 {
     @Autowired
     private IBatchCustomerService batchCustomerService;
+
+    @Autowired
+    private IBatchQrCodeStatService qrCodeStatService;
 
     /**
      * 查询客户列表
@@ -186,6 +191,63 @@ public class BatchCustomerController extends BaseController
     {
         batchCustomer.setUpdateBy(getUsername());
         return toAjax(batchCustomerService.updateStatus(batchCustomer));
+    }
+
+    /**
+     * 重置客户登录密码（BCrypt 加密入库）
+     */
+    @PreAuthorize("@ss.hasPermi('batch:customer:edit')")
+    @Log(title = "客户管理", businessType = BusinessType.UPDATE)
+    @PutMapping("/resetPassword")
+    public AjaxResult resetPassword(@RequestBody BatchCustomer batchCustomer)
+    {
+        if (batchCustomer.getCustomerId() == null)
+        {
+            return AjaxResult.error("客户ID不能为空");
+        }
+        String password = batchCustomer.getPassword();
+        if (StringUtils.isEmpty(password) || password.length() < 6 || password.length() > 20)
+        {
+            return AjaxResult.error("密码长度必须为6-20位");
+        }
+        BatchCustomer update = new BatchCustomer();
+        update.setCustomerId(batchCustomer.getCustomerId());
+        update.setPassword(SecurityUtils.encryptPassword(password));
+        update.setUpdateBy(getUsername());
+        return toAjax(batchCustomerService.updateBatchCustomer(update));
+    }
+
+    /**
+     * 下载注册二维码（下载次数+1 后重定向到二维码图片地址）
+     */
+    @PreAuthorize("@ss.hasPermi('batch:customer:query')")
+    @Log(title = "客户管理", businessType = BusinessType.OTHER)
+    @GetMapping("/qrCode/download/{customerId}")
+    public void downloadQrCode(@PathVariable("customerId") Long customerId, HttpServletResponse response) throws IOException
+    {
+        BatchCustomer customer = batchCustomerService.selectBatchCustomerById(customerId);
+        if (customer == null || StringUtils.isEmpty(customer.getQrCodeUrl()))
+        {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+        qrCodeStatService.incrementDownloadCount(customer.getPhone());
+        response.sendRedirect(customer.getQrCodeUrl());
+    }
+
+    /**
+     * 查询客户二维码推广累计统计（扫码/下载/注册）
+     */
+    @PreAuthorize("@ss.hasPermi('batch:customer:query')")
+    @GetMapping("/qrCode/stat/{customerId}")
+    public AjaxResult qrCodeStat(@PathVariable("customerId") Long customerId)
+    {
+        BatchCustomer customer = batchCustomerService.selectBatchCustomerById(customerId);
+        if (customer == null)
+        {
+            return AjaxResult.error("客户不存在");
+        }
+        return AjaxResult.success(qrCodeStatService.selectTotalsByPhone(customer.getPhone()));
     }
 
     /**

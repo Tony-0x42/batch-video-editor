@@ -4,10 +4,12 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.utils.uuid.IdUtils;
@@ -16,6 +18,7 @@ import com.ruoyi.batch.customer.domain.BatchCustomerImportFail;
 import com.ruoyi.batch.customer.domain.BatchCustomerImportResult;
 import com.ruoyi.batch.customer.mapper.BatchCustomerMapper;
 import com.ruoyi.batch.customer.service.IBatchCustomerService;
+import com.ruoyi.batch.customer.service.IBatchQrCodeStatService;
 import com.ruoyi.batch.customer.utils.QrCodeUtil;
 
 /**
@@ -46,6 +49,13 @@ public class BatchCustomerServiceImpl implements IBatchCustomerService
 
     @Autowired
     private QrCodeUtil qrCodeUtil;
+
+    @Autowired
+    private IBatchQrCodeStatService qrCodeStatService;
+
+    /** 后台新增客户时的初始密码（配置项 batch.app.default-password） */
+    @Value("${batch.app.default-password:123456}")
+    private String defaultPassword;
 
     @Override
     public List<BatchCustomer> selectBatchCustomerList(BatchCustomer batchCustomer)
@@ -81,6 +91,10 @@ public class BatchCustomerServiceImpl implements IBatchCustomerService
     public int insertBatchCustomer(BatchCustomer batchCustomer)
     {
         validateInsert(batchCustomer);
+
+        // 未指定密码时使用初始密码，统一 BCrypt 加密入库，保证账号可直接登录
+        String rawPassword = StringUtils.isEmpty(batchCustomer.getPassword()) ? defaultPassword : batchCustomer.getPassword();
+        batchCustomer.setPassword(SecurityUtils.encryptPassword(rawPassword));
 
         batchCustomer.setDelFlag(DEL_FLAG_EXIST);
         batchCustomer.setStatus(STATUS_ENABLE);
@@ -142,6 +156,12 @@ public class BatchCustomerServiceImpl implements IBatchCustomerService
         // 生成二维码
         String qrCodeUrl = generateQrCode(batchCustomer.getCustomerId());
         batchCustomer.setQrCodeUrl(qrCodeUrl);
+
+        // 有上级手机号时，上级二维码的注册次数+1
+        if (StringUtils.isNotEmpty(batchCustomer.getParentPhone()))
+        {
+            qrCodeStatService.incrementRegisterCount(batchCustomer.getParentPhone());
+        }
 
         return rows;
     }

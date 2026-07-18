@@ -77,7 +77,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <update id="incrementGeneratedCount">
         update batch_ai_video_group
-        set generated_count = generated_count + 1
+        set generated_count = generated_count + #{count}
         where group_id = #{groupId}
     </update>
 

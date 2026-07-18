@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import com.example.cj.videoeditor.activity.LoginActivity;
 
 import javax.inject.Inject;
@@ -54,9 +55,16 @@ public class MainActivity extends AppCompatActivity {
         initBottomNavigation();
         AppConfig.loadGlobalConfig(this, apiService);
 
-        if (savedInstanceState == null) {
-            switchFragment(0);
+        if (savedInstanceState != null) {
+            // 进程重建时 FragmentManager 会自动恢复旧 Fragment 实例，
+            // 与 navFragments 中的新实例不是同一批，先移除避免页面叠加
+            FragmentTransaction cleanup = getSupportFragmentManager().beginTransaction();
+            for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+                cleanup.remove(fragment);
+            }
+            cleanup.commitNow();
         }
+        switchFragment(0);
     }
 
     private void initBottomNavigation() {
@@ -77,11 +85,23 @@ public class MainActivity extends AppCompatActivity {
 
     private void switchFragment(int index) {
         selectedTab = index;
-        currentFragment = navFragments[index];
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragment_container, currentFragment)
-                .commit();
+        Fragment target = navFragments[index];
+        if (target == currentFragment) {
+            updateSelectedTab(index);
+            return;
+        }
+        // 使用 add + show/hide 切换，避免 replace 导致的视图重建与重复网络请求
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        if (currentFragment != null && currentFragment.isAdded()) {
+            transaction.hide(currentFragment);
+        }
+        if (target.isAdded()) {
+            transaction.show(target);
+        } else {
+            transaction.add(R.id.fragment_container, target);
+        }
+        transaction.commit();
+        currentFragment = target;
         updateSelectedTab(index);
     }
 

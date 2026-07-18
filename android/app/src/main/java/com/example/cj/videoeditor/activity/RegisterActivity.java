@@ -1,7 +1,10 @@
 package com.example.cj.videoeditor.activity;
 
 import dagger.hilt.android.AndroidEntryPoint;
+
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -15,6 +18,10 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.core.content.ContextCompat;
+
 import com.example.cj.videoeditor.MainActivity;
 import com.example.cj.videoeditor.R;
 import com.example.cj.videoeditor.network.ApiService;
@@ -23,9 +30,15 @@ import com.example.cj.videoeditor.network.dto.AppRegisterBody;
 import com.example.cj.videoeditor.network.dto.BatchCustomerDto;
 import com.example.cj.videoeditor.network.util.TokenManager;
 import com.example.cj.videoeditor.utils.AppConfig;
+import com.example.cj.videoeditor.utils.PhoneUtil;
 import com.example.cj.videoeditor.utils.ToastUtil;
 import com.example.cj.videoeditor.utils.UserSession;
 import com.google.android.material.button.MaterialButton;
+import com.journeyapps.barcodescanner.ScanContract;
+import com.journeyapps.barcodescanner.ScanOptions;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
@@ -38,6 +51,7 @@ public class RegisterActivity extends BaseActivity {
     TokenManager tokenManager;
 
     private TextView tvParentPhone;
+    private TextView btnScanQrcode;
     private EditText etPhone;
     private EditText etPassword;
     private EditText etConfirmPassword;
@@ -56,6 +70,29 @@ public class RegisterActivity extends BaseActivity {
 
     private String rawParentPhone = "";
 
+    private final ActivityResultLauncher<ScanOptions> scanLauncher =
+            registerForActivityResult(new ScanContract(), result -> {
+                if (result.getContents() == null) {
+                    return;
+                }
+                String phone = extractPhone(result.getContents());
+                if (PhoneUtil.isValidPhone(phone)) {
+                    rawParentPhone = phone;
+                    tvParentPhone.setText(PhoneUtil.maskPhone(phone));
+                } else {
+                    ToastUtil.show(this, R.string.scan_qrcode_invalid);
+                }
+            });
+
+    private final ActivityResultLauncher<String> cameraPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> {
+                if (granted) {
+                    launchScanner();
+                } else {
+                    ToastUtil.show(this, R.string.camera_permission_required);
+                }
+            });
+
     @Override
     protected int getContentLayoutId() {
         return R.layout.activity_register;
@@ -65,6 +102,7 @@ public class RegisterActivity extends BaseActivity {
     protected void initViews() {
         setTitle(getString(R.string.register));
         tvParentPhone = findViewById(R.id.tv_parent_phone);
+        btnScanQrcode = findViewById(R.id.btn_scan_qrcode);
         etPhone = findViewById(R.id.et_phone);
         etPassword = findViewById(R.id.et_password);
         etConfirmPassword = findViewById(R.id.et_confirm_password);
@@ -83,7 +121,8 @@ public class RegisterActivity extends BaseActivity {
         if (rawParentPhone == null) {
             rawParentPhone = "";
         }
-        tvParentPhone.setText(rawParentPhone.isEmpty() ? "暂无上级" : rawParentPhone.replaceAll("(\\d{3})\\d{4}(\\d{4})", "$1****$2"));
+        tvParentPhone.setText(rawParentPhone.isEmpty() ? "暂无上级" : PhoneUtil.maskPhone(rawParentPhone));
+        btnScanQrcode.setOnClickListener(v -> startScan());
 
         String prefix = getString(R.string.agreement_prefix) + getString(R.string.user_agreement) + getString(R.string.and) + getString(R.string.privacy_policy);
         tvAgreement.setText(prefix);
@@ -133,8 +172,42 @@ public class RegisterActivity extends BaseActivity {
     }
 
     private boolean isPhoneValid() {
-        String phone = etPhone.getText().toString().trim();
-        return phone.length() == 11 && phone.startsWith("1");
+        return PhoneUtil.isValidPhone(etPhone.getText().toString().trim());
+    }
+
+    private void startScan() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED) {
+            launchScanner();
+        } else {
+            cameraPermissionLauncher.launch(Manifest.permission.CAMERA);
+        }
+    }
+
+    private void launchScanner() {
+        ScanOptions options = new ScanOptions();
+        options.setDesiredBarcodeFormats(ScanOptions.QR_CODE);
+        options.setPrompt(getString(R.string.scan_prompt));
+        options.setBeepEnabled(false);
+        options.setOrientationLocked(true);
+        scanLauncher.launch(options);
+    }
+
+    /**
+     * 从扫码结果中提取 11 位上级手机号。
+     *
+     * 支持两种格式：纯手机号，或推广链接（如 http://host/batch/qrcode/scan?phone=138xxx）。
+     */
+    private String extractPhone(String contents) {
+        if (contents == null) {
+            return "";
+        }
+        String text = contents.trim();
+        if (PhoneUtil.isValidPhone(text)) {
+            return text;
+        }
+        Matcher matcher = Pattern.compile("1\\d{10}").matcher(text);
+        return matcher.find() ? matcher.group() : "";
     }
 
     private void attemptRegister() {

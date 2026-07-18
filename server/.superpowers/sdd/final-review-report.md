@@ -434,4 +434,4 @@ exportFunc(this.queryParams).then(response => {
 本次集成审查发现项目已完成 9 大模块的主体开发，菜单、权限、路由、前后端接口路径总体对齐，客户管理的核心业务规则（手机号唯一、上下级校验、删除前无下级、数据权限）实现较为完整。但存在 **4 个 Critical 级别的功能缺陷** 和 **6 个 Important 级别的影响用户体验或违反全局约束的问题**，需在上线前集中修复。建议优先处理 Critical 问题，随后完成 Important 问题，最后清理占位代码和类型不一致等技术债务。
 
 **审查人**：Kimi Code CLI  
-**输出文件**：`D:/project/batch-video-editor/batch-video-server/.superpowers/sdd/final-review-report.md`
+**输出文件**：`D:/project/batch-video-editor/server/.superpowers/sdd/final-review-report.md`

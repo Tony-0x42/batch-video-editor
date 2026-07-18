@@ -12,6 +12,9 @@ public class BatchAiVideoGenerateBody
     @NotNull(message = "视频组ID不能为空")
     private Long groupId;
 
+    /** 本次生成数量（默认1，上限10） */
+    private Integer count;
+
     /** 本次生成消耗算力 */
     private Integer consumeValue;
 
@@ -26,6 +29,16 @@ public class BatchAiVideoGenerateBody
     public void setGroupId(Long groupId)
     {
         this.groupId = groupId;
+    }
+
+    public Integer getCount()
+    {
+        return count;
+    }
+
+    public void setCount(Integer count)
+    {
+        this.count = count;
     }
 
     public Integer getConsumeValue()

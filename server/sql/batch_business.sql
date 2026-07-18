@@ -25,6 +25,7 @@ create table batch_customer (
   computing_power_total     decimal(18,2)   default 0.00               comment '算力总配额 GF',
   computing_power_used      decimal(18,2)   default 0.00               comment '已消耗算力 GF',
   vip_expire_date           date            default null               comment 'VIP 有效期',
+  avatar_url                varchar(500)    default ''                 comment '头像地址',
   qr_code_url               varchar(500)    default ''                 comment '注册二维码图片 URL',
   qr_code_key               varchar(100)    default ''                 comment '二维码唯一 key（重置时变更）',
   status                    tinyint(1)      not null default 0         comment '状态：0 启用 / 1 禁用',

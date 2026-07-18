@@ -122,6 +122,9 @@ public class HomeFragment extends Fragment {
             @Override
             public void onSuccess(long total, List<BatchHomeBannerDto> rows) {
                 finishRequest();
+                if (!isAdded() || getContext() == null) {
+                    return;
+                }
                 banners = new ArrayList<>();
                 for (BatchHomeBannerDto dto : rows) {
                     banners.add(new Banner(
@@ -151,6 +154,9 @@ public class HomeFragment extends Fragment {
             @Override
             public void onError(String msg) {
                 finishRequest();
+                if (!isAdded() || getContext() == null) {
+                    return;
+                }
                 ToastUtil.show(getContext(), msg);
                 bannerContainer.setVisibility(View.GONE);
             }
@@ -180,6 +186,7 @@ public class HomeFragment extends Fragment {
         autoScrollHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
+                if (!isAdded() || viewPagerBanner == null) return;
                 if (banners.size() == 0) return;
                 int next = (viewPagerBanner.getCurrentItem() + 1) % banners.size();
                 viewPagerBanner.setCurrentItem(next, true);
@@ -194,6 +201,9 @@ public class HomeFragment extends Fragment {
             @Override
             public void onSuccess(long total, List<BatchHomeNewsDto> rows) {
                 finishRequest();
+                if (!isAdded() || getContext() == null) {
+                    return;
+                }
                 BatchHomeNewsDto dto = rows.isEmpty() ? null : rows.get(0);
                 if (dto == null) {
                     tvAnnouncementTitle.setText("");
@@ -212,6 +222,9 @@ public class HomeFragment extends Fragment {
             @Override
             public void onError(String msg) {
                 finishRequest();
+                if (!isAdded() || getContext() == null) {
+                    return;
+                }
                 ToastUtil.show(getContext(), msg);
             }
         });
@@ -223,6 +236,9 @@ public class HomeFragment extends Fragment {
             @Override
             public void onSuccess(long total, List<BatchAppNoticeDto> rows) {
                 finishRequest();
+                if (!isAdded() || getContext() == null) {
+                    return;
+                }
                 if (rows == null || rows.isEmpty()) {
                     llNotice.setVisibility(View.GONE);
                     return;
@@ -238,6 +254,9 @@ public class HomeFragment extends Fragment {
             @Override
             public void onError(String msg) {
                 finishRequest();
+                if (!isAdded() || getContext() == null) {
+                    return;
+                }
                 llNotice.setVisibility(View.GONE);
             }
         });
@@ -249,6 +268,9 @@ public class HomeFragment extends Fragment {
             @Override
             public void onSuccess(long total, List<BatchHomeEntryDto> rows) {
                 finishRequest();
+                if (!isAdded() || getContext() == null) {
+                    return;
+                }
                 List<HomeMenu> menus = new ArrayList<>();
                 for (BatchHomeEntryDto dto : rows) {
                     String name = dto.getEntryName() != null ? dto.getEntryName() : "";
@@ -267,6 +289,9 @@ public class HomeFragment extends Fragment {
             @Override
             public void onError(String msg) {
                 finishRequest();
+                if (!isAdded() || getContext() == null) {
+                    return;
+                }
                 ToastUtil.show(getContext(), msg);
             }
         });
@@ -319,6 +344,9 @@ public class HomeFragment extends Fragment {
             @Override
             public void onSuccess(long total, List<BatchHomeTutorialEntryDto> rows) {
                 finishRequest();
+                if (!isAdded() || getContext() == null) {
+                    return;
+                }
                 if (rows == null || rows.isEmpty()) {
                     llTutorial.setVisibility(View.GONE);
                     return;
@@ -352,6 +380,9 @@ public class HomeFragment extends Fragment {
             @Override
             public void onError(String msg) {
                 finishRequest();
+                if (!isAdded() || getContext() == null) {
+                    return;
+                }
                 llTutorial.setVisibility(View.GONE);
             }
         });

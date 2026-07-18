@@ -48,7 +48,7 @@
 </template>
 
 <script>
-import { getCustomer, resetCustomerQrCode } from "@/api/batch/customer"
+import { getCustomer, resetCustomerQrCode, getCustomerQrCodeStat, downloadCustomerQrCode } from "@/api/batch/customer"
 
 export default {
   name: "BatchCustomerQrCode",
@@ -71,7 +71,9 @@ export default {
     getDetail() {
       getCustomer(this.customerId).then(response => {
         this.customer = response.data || {}
-        // TODO: 后续接入二维码推广统计接口
+      })
+      getCustomerQrCodeStat(this.customerId).then(response => {
+        this.stat = response.data || { scanCount: 0, downloadCount: 0, registerCount: 0 }
       })
     },
     goBack() {
@@ -86,14 +88,18 @@ export default {
         this.$modal.msgError("二维码不存在")
         return
       }
-      const a = document.createElement('a')
-      a.href = this.customer.qrCodeUrl
-      a.download = 'qrcode_' + this.customer.phone + '.png'
-      a.target = '_blank'
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      this.$modal.msgSuccess("已开始下载")
+      downloadCustomerQrCode(this.customerId).then(res => {
+        const blob = new Blob([res], { type: 'image/png' })
+        const a = document.createElement('a')
+        a.href = URL.createObjectURL(blob)
+        a.download = 'qrcode_' + this.customer.phone + '.png'
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(a.href)
+        this.stat.downloadCount = (this.stat.downloadCount || 0) + 1
+        this.$modal.msgSuccess("已开始下载")
+      }).catch(() => {})
     },
     handleCopyLink() {
       if (!this.customer.qrCodeUrl) {
@@ -115,10 +121,9 @@ export default {
       }
     },
     buildPromoteLink() {
-      // 与后端 QrCodeUtil.buildQrContent 保持一致
-      const baseUrl = process.env.VUE_APP_APP_DOWNLOAD_URL || 'https://batchvideo.example.com/download'
-      const sep = baseUrl.indexOf('?') === -1 ? '?' : '&'
-      return baseUrl + sep + 'invitePhone=' + this.customer.phone
+      // 与后端 QrCodeUtil 二维码内容保持一致：扫码统计接口，扫码后 302 跳 APP 下载页
+      // 注意：生产环境 VUE_APP_BASE_API 需与后端 batch.app.server-url 指向同一服务地址
+      return process.env.VUE_APP_BASE_API + '/batch/qrcode/scan?phone=' + this.customer.phone
     },
     handleReset() {
       this.$modal.confirm('重置二维码后旧二维码将立即失效，是否继续？').then(() => {

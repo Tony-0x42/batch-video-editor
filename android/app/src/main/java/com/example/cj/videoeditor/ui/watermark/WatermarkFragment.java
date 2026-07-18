@@ -120,6 +120,14 @@ public class WatermarkFragment extends Fragment {
             // 视频 URL 可能无法直接播放，屏蔽系统错误弹窗
             return true;
         });
+        // 点击视频区域切换播放/暂停
+        videoView.setOnClickListener(v -> {
+            if (videoView.isPlaying()) {
+                videoView.pause();
+            } else {
+                videoView.start();
+            }
+        });
     }
 
     private void parse() {
@@ -187,10 +195,41 @@ public class WatermarkFragment extends Fragment {
         tabVideo.setTextColor(getResources().getColor(tab == 0 ? R.color.colorPrimary : R.color.textSecondary));
         tabImage.setTextColor(getResources().getColor(tab == 1 ? R.color.colorPrimary : R.color.textSecondary));
         tabText.setTextColor(getResources().getColor(tab == 2 ? R.color.colorPrimary : R.color.textSecondary));
-        videoView.setVisibility(View.GONE);
-        tvVideoPlaceholder.setVisibility(tab == 0 ? View.VISIBLE : View.GONE);
-        recyclerImages.setVisibility(tab == 1 ? View.VISIBLE : View.GONE);
+        if (tab == 0 && result != null && !TextUtils.isEmpty(result.videoUrl)) {
+            // 有可播放视频时隐藏占位，加载并播放解析出的视频
+            tvVideoPlaceholder.setVisibility(View.GONE);
+            recyclerImages.setVisibility(View.GONE);
+            videoView.setVisibility(View.VISIBLE);
+            videoView.setVideoPath(result.videoUrl);
+            videoView.setOnPreparedListener(mp -> {
+                mp.setLooping(true);
+                videoView.start();
+            });
+        } else {
+            if (videoView.isPlaying()) {
+                videoView.pause();
+            }
+            videoView.setVisibility(View.GONE);
+            tvVideoPlaceholder.setVisibility(tab == 0 ? View.VISIBLE : View.GONE);
+            recyclerImages.setVisibility(tab == 1 ? View.VISIBLE : View.GONE);
+        }
         scrollText.setVisibility(tab == 2 ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (videoView != null && videoView.isPlaying()) {
+            videoView.pause();
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        if (videoView != null) {
+            videoView.stopPlayback();
+        }
+        super.onDestroyView();
     }
 
     private void hideKeyboard() {

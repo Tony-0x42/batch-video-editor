@@ -20,6 +20,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="computingPowerUsed"      column="computing_power_used"     />
         <result property="computingPowerRemain"    column="computing_power_remain"   />
         <result property="vipExpireDate"           column="vip_expire_date"          />
+        <result property="avatarUrl"               column="avatar_url"               />
         <result property="qrCodeUrl"               column="qr_code_url"              />
         <result property="qrCodeKey"               column="qr_code_key"              />
         <result property="status"                  column="status"                   />
@@ -36,7 +37,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select c.customer_id, c.customer_type, c.customer_name, c.contact_name, c.phone, c.password,
                c.parent_phone, c.branch_phone, c.max_service_provider, c.total_individual_capacity,
                c.max_individual, c.computing_power_total, c.computing_power_used,
-               c.computing_power_remain, c.vip_expire_date, c.qr_code_url, c.qr_code_key,
+               c.computing_power_remain, c.vip_expire_date, c.avatar_url, c.qr_code_url, c.qr_code_key,
                c.status, c.del_flag, c.create_by, c.create_time, c.update_by, c.update_time, c.remark,
                (select count(*) from batch_customer sub where sub.parent_phone = c.phone and sub.del_flag = 0) as subordinate_count
         from batch_customer c
@@ -137,6 +138,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="computingPowerUsed != null">computing_power_used,</if>
             <if test="computingPowerRemain != null">computing_power_remain,</if>
             <if test="vipExpireDate != null">vip_expire_date,</if>
+            <if test="avatarUrl != null">avatar_url,</if>
             <if test="qrCodeUrl != null">qr_code_url,</if>
             <if test="qrCodeKey != null">qr_code_key,</if>
             <if test="status != null">status,</if>
@@ -160,6 +162,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="computingPowerUsed != null">#{computingPowerUsed},</if>
             <if test="computingPowerRemain != null">#{computingPowerRemain},</if>
             <if test="vipExpireDate != null">#{vipExpireDate},</if>
+            <if test="avatarUrl != null">#{avatarUrl},</if>
             <if test="qrCodeUrl != null">#{qrCodeUrl},</if>
             <if test="qrCodeKey != null">#{qrCodeKey},</if>
             <if test="status != null">#{status},</if>
@@ -185,6 +188,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="computingPowerUsed != null">computing_power_used = #{computingPowerUsed},</if>
             <if test="computingPowerRemain != null">computing_power_remain = #{computingPowerRemain},</if>
             <if test="vipExpireDate != null">vip_expire_date = #{vipExpireDate},</if>
+            <if test="avatarUrl != null">avatar_url = #{avatarUrl},</if>
             <if test="qrCodeUrl != null">qr_code_url = #{qrCodeUrl},</if>
             <if test="qrCodeKey != null">qr_code_key = #{qrCodeKey},</if>
             <if test="status != null">status = #{status},</if>
@@ -234,6 +238,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             computing_power_remain = computing_power_remain - #{value},
             update_time = sysdate()
         where customer_id = #{customerId}
+          and computing_power_remain &gt;= #{value}
+    </update>
+
+    <update id="consumeComputingPowerByPhone">
+        update batch_customer
+        set computing_power_used = computing_power_used + #{value},
+            computing_power_remain = computing_power_remain - #{value},
+            update_time = sysdate()
+        where phone = #{phone}
+          and del_flag = 0
           and computing_power_remain &gt;= #{value}
     </update>
 

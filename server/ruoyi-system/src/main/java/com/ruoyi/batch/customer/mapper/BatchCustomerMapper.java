@@ -126,4 +126,13 @@ public interface BatchCustomerMapper
      * @return 影响行数
      */
     public int consumeComputingPower(@Param("customerId") Long customerId, @Param("value") java.math.BigDecimal value);
+
+    /**
+     * 按手机号原子扣减算力（余额不足时影响行数为 0）
+     *
+     * @param phone 手机号
+     * @param value 扣减值
+     * @return 影响行数
+     */
+    public int consumeComputingPowerByPhone(@Param("phone") String phone, @Param("value") java.math.BigDecimal value);
 }

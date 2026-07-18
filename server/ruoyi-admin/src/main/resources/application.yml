@@ -145,3 +145,9 @@ xss:
   excludes: /system/notice
   # 匹配链接
   urlPatterns: /system/*,/monitor/*,/tool/*
+
+# 批量剪辑 视频生成配置
+batch:
+  video:
+    # FFmpeg 可执行文件路径，默认 ffmpeg（从 PATH 查找）；服务器未安装或不在 PATH 时请配置绝对路径
+    ffmpeg-path: ffmpeg

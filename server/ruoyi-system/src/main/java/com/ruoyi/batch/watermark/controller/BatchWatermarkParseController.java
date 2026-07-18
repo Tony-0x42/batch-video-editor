@@ -3,6 +3,7 @@ package com.ruoyi.batch.watermark.controller;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -47,7 +48,7 @@ public class BatchWatermarkParseController extends BaseController
     }
 
     /**
-     * 根据 ID 获取解析详情
+     * 根据 ID 获取解析详情（仅本人记录可查）
      */
     @PreAuthorize("@ss.hasPermi('app:user')")
     @Log(title = "AI去水印解析记录", businessType = BusinessType.OTHER)
@@ -55,6 +56,15 @@ public class BatchWatermarkParseController extends BaseController
     public AjaxResult getInfo(@PathVariable("parseId") Long parseId)
     {
         BatchWatermarkParse parse = batchWatermarkParseService.selectBatchWatermarkParseById(parseId);
+        if (parse == null)
+        {
+            return AjaxResult.error("解析记录不存在");
+        }
+        String phone = SecurityUtils.getLoginUser().getUsername();
+        if (!phone.equals(parse.getPhone()))
+        {
+            return AjaxResult.error("无权查看该解析记录");
+        }
         return AjaxResult.success(parse);
     }
 
@@ -93,12 +103,23 @@ public class BatchWatermarkParseController extends BaseController
     }
 
     /**
-     * 删除解析记录
+     * 删除解析记录（兼容旧的 GET 方式）
      */
     @PreAuthorize("@ss.hasPermi('app:user')")
     @Log(title = "AI去水印解析记录", businessType = BusinessType.DELETE)
     @GetMapping("/delete/{parseIds}")
     public AjaxResult remove(@PathVariable Long[] parseIds)
+    {
+        return toAjax(batchWatermarkParseService.deleteBatchWatermarkParseByIds(parseIds));
+    }
+
+    /**
+     * 删除解析记录
+     */
+    @PreAuthorize("@ss.hasPermi('app:user')")
+    @Log(title = "AI去水印解析记录", businessType = BusinessType.DELETE)
+    @DeleteMapping("/{parseIds}")
+    public AjaxResult removeByDelete(@PathVariable Long[] parseIds)
     {
         return toAjax(batchWatermarkParseService.deleteBatchWatermarkParseByIds(parseIds));
     }

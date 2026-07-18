@@ -29,7 +29,8 @@ public class UserStore {
         SharedPrefUtil.putString(context, AppConfig.SP_KEY_USER_PHONE, dto.getPhone());
         SharedPrefUtil.putString(context, AppConfig.SP_KEY_USER_NAME,
                 dto.getCustomerName() != null ? dto.getCustomerName() : dto.getContactName());
-        SharedPrefUtil.putString(context, AppConfig.SP_KEY_USER_AVATAR, dto.getQrCodeUrl());
+        SharedPrefUtil.putString(context, AppConfig.SP_KEY_USER_AVATAR,
+                dto.getAvatarUrl() != null ? dto.getAvatarUrl() : "");
         boolean vip = dto.getVipExpireDate() != null && !dto.getVipExpireDate().isEmpty();
         SharedPrefUtil.putBoolean(context, AppConfig.SP_KEY_USER_VIP, vip);
         SharedPrefUtil.putString(context, AppConfig.SP_KEY_USER_VIP_EXPIRE, dto.getVipExpireDate());
@@ -46,8 +47,8 @@ public class UserStore {
         user.setAvatar(SharedPrefUtil.getString(context, AppConfig.SP_KEY_USER_AVATAR, ""));
         user.setVip(SharedPrefUtil.getBoolean(context, AppConfig.SP_KEY_USER_VIP, false));
         user.setVipExpire(SharedPrefUtil.getString(context, AppConfig.SP_KEY_USER_VIP_EXPIRE, ""));
-        user.setComputePower(SharedPrefUtil.getInt(context, AppConfig.SP_KEY_COMPUTE_TOTAL, 1000));
-        user.setUsedComputePower(SharedPrefUtil.getInt(context, AppConfig.SP_KEY_COMPUTE_USED, 356));
+        user.setComputePower(SharedPrefUtil.getInt(context, AppConfig.SP_KEY_COMPUTE_TOTAL, 0));
+        user.setUsedComputePower(SharedPrefUtil.getInt(context, AppConfig.SP_KEY_COMPUTE_USED, 0));
         if (user.getPhone().isEmpty()) {
             return null;
         }

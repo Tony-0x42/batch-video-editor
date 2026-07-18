@@ -19,6 +19,11 @@ public interface BatchAiVideoClipMapper
     public int insertBatchAiVideoClip(BatchAiVideoClip clip);
 
     /**
+     * 批量新增分镜头
+     */
+    public int insertBatchAiVideoClipBatch(java.util.List<BatchAiVideoClip> clips);
+
+    /**
      * 修改分镜头
      */
     public int updateBatchAiVideoClip(BatchAiVideoClip clip);

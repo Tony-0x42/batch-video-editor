@@ -4,7 +4,7 @@ import java.util.List;
 import com.ruoyi.batch.computing.domain.BatchComputingPowerLog;
 
 /**
- * computing业务模块Mapper接口占位
+ * 算力消耗日志Mapper接口
  *
  * @author ruoyi
  */

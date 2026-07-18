@@ -58,12 +58,12 @@ INSERT INTO batch_document (document_title, document_type, apply_pages, content,
 ('如何快速去除视频水印', 3, 'document', '1. 复制短视频平台分享链接；\n2. 打开 AI 去水印页面粘贴链接；\n3. 点击解析并等待处理完成；\n4. 预览去水印结果后点击保存。', 1, 0, 0, 0, 'admin', NOW()),
 ('AI 云创分镜头管理', 3, 'document', '在 AI 云创页面，您可以创建视频组并上传素材，系统自动分割成分镜头。支持拖拽排序、镜像翻转和替换素材。', 2, 0, 0, 0, 'admin', NOW()),
 ('算力不足怎么办？', 4, 'document', '当算力耗尽时，视频生成与下载功能将被禁用，请联系管理员增加算力额度。', 3, 0, 0, 0, 'admin', NOW()),
-('用户协议', 1, 'agreement', '欢迎使用批量剪辑 AI。请遵守相关法律法规。', 1, 0, 1, 0, 'admin', NOW()),
-('隐私政策', 2, 'privacy', '批量剪辑 AI 重视您的个人信息保护。', 1, 0, 1, 0, 'admin', NOW());
+('用户协议', 1, 'agreement', '欢迎使用批量剪辑。请遵守相关法律法规。', 1, 0, 1, 0, 'admin', NOW()),
+('隐私政策', 2, 'privacy', '批量剪辑 重视您的个人信息保护。', 1, 0, 1, 0, 'admin', NOW());
 
 -- 品牌
 INSERT INTO batch_brand (brand_name, logo_url, intro, detail, media_urls, sort_weight, status, del_flag, create_by, create_time) VALUES
-('批量剪辑', '', '批量剪辑 AI 短视频创作品牌', '批量剪辑致力于通过 AI 技术降低短视频创作门槛。', 'https://placehold.co/400x300/2196F3/FFFFFF?text=Brand1', 1, 0, 0, 'admin', NOW()),
+('批量剪辑', '', '批量剪辑 短视频创作品牌', '批量剪辑致力于通过 AI 技术降低短视频创作门槛。', 'https://placehold.co/400x300/2196F3/FFFFFF?text=Brand1', 1, 0, 0, 'admin', NOW()),
 ('星辰传媒', '', '品牌宣传与短视频运营服务商', '星辰传媒提供全链路短视频运营服务。', 'https://placehold.co/400x300/1976D2/FFFFFF?text=Brand2', 2, 0, 0, 'admin', NOW());
 
 -- 联系方式 (contact_type: 1 在线客服, 2 总部热线, 3 区域联系)

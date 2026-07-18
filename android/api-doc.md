@@ -1,6 +1,6 @@
-# 批量剪辑 APP - batch-video-server 后端 API 对接文档
+# 批量剪辑 APP - server 后端 API 对接文档
 
-> 后端工程：`D:/project/batch-video-editor/batch-video-server`（RuoYi 3.9.2）  
+> 后端工程：`D:/project/batch-video-editor/server`（RuoYi 3.9.2）  
 > 后端端口：`8080`  
 > 应用上下文：`/`（无前缀）  
 > 基础 Base URL（本地）：`http://localhost:8080/`  
@@ -24,20 +24,26 @@
 
 ### 1.2 匿名放行接口
 
-Spring Security 中明确放行：
+Spring Security（`SecurityConfig`）中明确放行：
 
 ```
-/login
-/register
-/captchaImage
-/                      （静态首页）
-/*.html / **.html / **.css / **.js
-/profile/**
-/swagger-ui.html / /v3/api-docs/** / /swagger-ui/** / /druid/**
+/login /register /captchaImage
+POST /batch/app/login              （APP 手机号+密码登录）
+POST /batch/app/register           （APP 扫码注册）
+GET  /batch/qrcode/scan            （注册二维码扫码统计，@Anonymous 注解放行）
+GET  /batch/home/banner/list、/batch/home/entry/list、/batch/home/news/list、/batch/home/tutorialEntry/list
+GET  /batch/tutorial/list、/batch/tutorial/category/all、/batch/tutorial/*
+GET  /batch/document/list、/batch/document/*
+GET  /batch/notice/list、/batch/notice/*
+GET  /batch/config/brand、/batch/config/global
+GET  /batch/brand/list、/batch/contact/list
+/ 、/*.html、/**.html、/**.css、/**.js、/profile/**
+/swagger-ui.html、/v3/api-docs/**、/swagger-ui/**、/druid/**
 ```
 
-**所有 `/batch/*` 接口均未加 `@Anonymous` 注解，且 `anyRequest().authenticated()`，因此全部需要 JWT 认证。**  
-> 当前后端 `/batch/customer/phone/{phone}` 需要 `batch:customer:query` 权限，**不适合直接作为 APP 登录接口**。APP 手机号+密码登录目前应使用 `/login`，但需要后端在创建 `batch_customer` 时同步创建/维护对应的 `sys_user`（用户名=手机号）账号。
+- 标注 `@Anonymous` 注解的接口由 `PermitAllUrlProperties` 自动扫描放行（如 `/batch/qrcode/scan`）。
+- **除上述外，其余接口（含全部写操作与 `/batch/ai/video/*`、`/batch/watermark/*`、`/batch/computing/*`）均需 JWT 认证（`anyRequest().authenticated()`）。**
+- APP 端登录/注册请使用 `/batch/app/login`、`/batch/app/register`（见第 13 节），返回的 JWT 与 RuoYi 后台 Token 体系一致，权限标识为 `app:user`。
 
 ### 1.3 统一响应结构
 
@@ -115,7 +121,7 @@ Content-Type: application/json
 }
 ```
 
-**注意：** 当前 `/login` 校验 `sys_user` 表。若 APP 账号只存在于 `batch_customer` 而无对应 `sys_user`，则登录会失败，需要后端补充 APP 账号登录/注册逻辑。
+**注意：** `/login` 校验 `sys_user` 表，用于**管理后台**登录。APP 端手机号+密码登录请使用 `POST /batch/app/login`（校验 `batch_customer` 表，见第 13 节）。
 
 ### 2.2 获取当前登录用户信息
 
@@ -160,7 +166,7 @@ Content-Type: application/json
 | code         | string | 否   | 验证码             |
 | uuid         | string | 否   | 验证码唯一标识     |
 
-**说明：** `/register` 默认写入 `sys_user`，且受 `sys.account.registerUser` 配置开关控制。APP 扫码注册可能需要后端新增 `/batch/customer/register` 之类的接口。
+**说明：** `/register` 写入 `sys_user`（管理后台账号体系），受 `sys.account.registerUser` 配置开关控制，**不用于 APP**。APP 扫码注册请使用 `POST /batch/app/register`（见第 13 节）。
 
 ### 2.5 验证码
 
@@ -187,10 +193,34 @@ GET /captchaImage
 | POST | `/batch/customer` | `batch:customer:add` | 新增客户 |
 | PUT | `/batch/customer` | `batch:customer:edit` | 修改客户 |
 | PUT | `/batch/customer/changeStatus` | `batch:customer:edit` | 修改状态（启用/禁用） |
+| PUT | `/batch/customer/resetPassword` | `batch:customer:edit` | 重置客户登录密码（BCrypt 入库，密码长度 6-20 位） |
 | DELETE | `/batch/customer/{customerIds}` | `batch:customer:remove` | 删除客户 |
 | PUT | `/batch/customer/qrCode/{customerId}` | `batch:customer:resetQr` | 生成/重置注册二维码 |
+| GET | `/batch/customer/qrCode/download/{customerId}` | `batch:customer:query` | 下载注册二维码（下载次数+1 后 302 重定向到二维码图片地址） |
+| GET | `/batch/customer/qrCode/stat/{customerId}` | `batch:customer:query` | 查询该客户二维码推广累计统计 |
 | PUT | `/batch/customer/upgrade/{customerId}` | `batch:customer:upgrade` | 账号升级 |
 | PUT | `/batch/customer/migrate/{customerId}` | `batch:customer:migrate` | 账号迁移 |
+
+**重置密码请求示例：**
+
+```json
+{
+  "customerId": 100,
+  "password": "newpass123"
+}
+```
+
+**二维码统计响应示例（`qrCode/stat`）：**
+
+```json
+{
+  "code": 200,
+  "msg": "操作成功",
+  "data": { "scanCount": 12, "downloadCount": 3, "registerCount": 5 }
+}
+```
+
+> 统计来源为 `batch_qr_code_stat` 表（按 phone + stat_date 累计扫码/下载/注册次数），明细报表见 `/batch/statistics/qrcode`。
 
 **BatchCustomer 主要字段：**
 
@@ -201,6 +231,8 @@ GET /captchaImage
 | customerName | string | 账号名称 |
 | contactName | string | 联系人 |
 | phone | string | 手机号（全局唯一） |
+| password | string | 登录密码（BCrypt 加密存储，仅写不读） |
+| avatarUrl | string | 头像 URL（APP「账号资料编辑」上传后回写） |
 | parentPhone | string | 上级手机号 |
 | branchPhone | string | 所属分公司手机号 |
 | maxServiceProvider | int | 分公司最大服务商数量 |
@@ -362,11 +394,29 @@ GET /captchaImage
 
 ## 8. 算力消耗日志接口（`/batch/computing/log`）
 
-权限前缀：`batch:customer:query`
+| 方法 | URL | 权限 | 说明 |
+|------|-----|------|------|
+| GET | `/batch/computing/log/list` | `batch:customer:query` | 算力消耗日志列表（后台，TableDataInfo） |
+| GET | `/batch/computing/log/my` | `app:user` | APP 查询当前登录账号的算力消耗日志（强制按当前手机号过滤，支持分页） |
+| POST | `/batch/computing/log/consume` | `app:user` | 消耗算力（APP 端下载/生成前调用），余额不足返回错误 |
 
-| 方法 | URL | 说明 |
-|------|-----|------|
-| GET | `/batch/computing/log/list` | 算力消耗日志列表（TableDataInfo） |
+**consume 请求体（ComputingConsumeBody）：**
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| operationType | int | 是 | 操作类型：1 生成 / 2 下载 |
+| consumeValue | decimal | 是 | 消耗算力值 |
+| bizNo | string | 否 | 业务单号/说明 |
+
+**consume 响应示例：**
+
+```json
+{
+  "code": 200,
+  "msg": "操作成功",
+  "remain": 985.00
+}
+```
 
 **BatchComputingPowerLog 字段：** `id`, `phone`, `operationType`(1 生成 / 2 下载), `consumeValue`, `remainValue`, `videoGroupName`, `createTime`
 
@@ -466,32 +516,212 @@ GET /captchaImage
 
 ---
 
-## 13. APP 端重点关注清单与下一步对接建议
+## 13. APP 端认证与账号接口（`/batch/app`）
 
-### 13.1 当前可直接对接的只读接口
+Controller：`BatchAppAuthController`。除登录/注册外均需 JWT；登录成功后权限标识为 `app:user`，Token 的 `username` 即手机号、`userId` 即 `customerId`。
 
-- 首页：GET `/batch/home/banner/list`、GET `/batch/home/entry/list`、GET `/batch/home/news/list`、GET `/batch/home/tutorialEntry/list`
-- 教程：GET `/batch/tutorial/list`、GET `/batch/tutorial/{id}`、GET `/batch/tutorial/category/all`
-- 文档：GET `/batch/document/list`、GET `/batch/document/{id}`
-- 公告：GET `/batch/notice/list`、GET `/batch/notice/{id}`
-- 配置：GET `/batch/config/brand`、GET `/batch/config/global`
-- 我的/账号：GET `/batch/customer/phone/{phone}`（仅查询，受权限限制）
-- 算力：GET `/batch/computing/log/list`
+| 方法 | URL | 匿名 | 说明 |
+|------|-----|------|------|
+| POST | `/batch/app/login` | 是 | APP 手机号+密码登录（校验 `batch_customer`） |
+| POST | `/batch/app/register` | 是 | APP 注册（个人账号，可带上级手机号） |
+| GET | `/batch/app/customer/phone/{phone}` | 否 | 查询当前账号信息（仅可查本人手机号） |
+| PUT | `/batch/app/customer` | 否 | 更新资料（仅 `customerName`/`contactName`/`avatarUrl`，敏感字段服务端强制忽略） |
+| POST | `/batch/app/changePassword` | 否 | 修改当前账号密码 |
+| POST | `/batch/app/logout` | 否 | 退出登录（清除 Token 缓存） |
+| POST | `/batch/app/upload` | 否 | 文件上传（头像等，Multipart：`file`），返回完整 URL |
+| DELETE | `/batch/app/customer` | 否 | 自助注销当前账号（存在下级账号时拦截） |
 
-### 13.2 需要后端补充的接口
+### 13.1 APP 登录
 
-| 需求 | 当前后端状态 | 建议 |
-|------|--------------|------|
-| APP 手机号+密码登录 | 只有 `/login`（校验 `sys_user`） | 建议新增 `/batch/customer/login`（phone + password）或确保创建 customer 时同步创建 sys_user 并返回 token |
-| APP 扫码注册 | 只有 `/register`（写入 `sys_user`） | 建议新增 `/batch/customer/register`（上级手机号 + phone + password） |
-| APP 修改自己密码 | 无对应接口 | 建议新增 `/batch/customer/changePassword` |
-| 算力检查/扣减 | 只有日志查询 | AI 云创生成、去水印下载前建议新增 `/batch/computing/check` 或 `/batch/computing/consume` |
-| 视频解析/去水印 | 无 | AI 去水印需要新增解析与下载接口 |
-| AI 视频分割/生成 | 无 | AI 云创需要新增任务提交与结果查询接口 |
+```http
+POST /batch/app/login
+Content-Type: application/json
+```
+
+**请求体（AppLoginBody）：**
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| phone | string | 是 | 手机号（`^1[3-9]\d{9}$`） |
+| password | string | 是 | 密码 |
+
+**响应：** `token` 与 `data`（BatchCustomer）同级返回。账号被禁用返回「账号已被禁用，请联系管理员」。
+
+### 13.2 APP 注册
+
+```http
+POST /batch/app/register
+Content-Type: application/json
+```
+
+**请求体（AppRegisterBody）：**
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| phone | string | 是 | 手机号（全局唯一，重复返回「该手机号已被注册」） |
+| password | string | 是 | 密码（BCrypt 入库） |
+| parentPhone | string | 否 | 上级手机号（扫码注册时由二维码解析带入） |
+
+注册成功后直接返回 `token` 与 `data`（BatchCustomer），默认创建为个人账号（customerType=3），同时累计上级账号的二维码注册次数。
+
+### 13.3 APP 修改密码
+
+```http
+POST /batch/app/changePassword
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+**请求体（ChangePasswordBody）：**
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| oldPassword | string | 是 | 原密码（错误返回「原密码错误」） |
+| newPassword | string | 是 | 新密码（长度 6-20 位） |
 
 ---
 
-## 14. 附录：HttpStatus 状态码对照
+## 14. AI 云创视频接口（`/batch/ai/video`）
+
+Controller：`BatchAiVideoController`。APP 端接口权限均为 `app:user`，且服务端校验视频组归属（仅可操作本账号的组）；生成记录后台列表权限为 `batch:aivideo:list`。
+
+### 14.1 视频组管理
+
+| 方法 | URL | 说明 |
+|------|-----|------|
+| GET | `/batch/ai/video/group/list` | 当前账号视频组列表（TableDataInfo 分页） |
+| GET | `/batch/ai/video/group/{groupId}` | 视频组详情（含分镜头 `clips`） |
+| POST | `/batch/ai/video/group` | 新增视频组（返回 `groupId`） |
+| PUT | `/batch/ai/video/group` | 修改视频组（含分镜头覆盖保存） |
+| DELETE | `/batch/ai/video/group/{groupId}` | 删除视频组 |
+
+**BatchAiVideoGroup 字段：** `groupId`, `phone`, `groupName`, `generatedCount`, `maxLimit`, `status`(0 启用 / 1 禁用), `sortWeight`, `clips`（非持久化）
+
+**BatchAiVideoClip 字段：** `clipId`, `groupId`, `videoUrl`, `textContent`（口播文案）, `duration`（秒）, `sortOrder`
+
+### 14.2 视频素材上传
+
+```http
+POST /batch/ai/video/upload
+Authorization: Bearer <token>
+Content-Type: multipart/form-data
+```
+
+- 表单字段：`file`。
+- 允许格式：`mp4 / mov / avi / flv / mkv / webm`。
+- 保存至 `profile/video/upload`，`data` 返回可访问的完整 URL（供 split/generate 使用）。
+
+### 14.3 AI 分割
+
+```http
+POST /batch/ai/video/split
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+**请求体（BatchAiVideoSplitBody）：**
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| groupId | long | 是 | 视频组 ID |
+| videoUrl | string | 是 | 已上传视频 URL（`/profile/` 开头或完整 URL） |
+| sliceDuration | double | 是 | 切片时长（秒），区间 0.5~10 |
+
+**响应：** `data` 为切片结果 `BatchAiVideoClip[]`（服务端调用 FFmpeg 切段并保存为该组分镜头）。
+
+### 14.4 提交批量生成
+
+```http
+POST /batch/ai/video/generate
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+**请求体（BatchAiVideoGenerateBody）：**
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| groupId | long | 是 | 视频组 ID |
+| count | int | 否 | 本次生成数量，默认 1，上限 10（超出返回「单次最多生成 10 个视频」） |
+| consumeValue | int | 否 | 本次生成单条消耗算力（缺省按全局参数计算） |
+| clips | array | 否 | 分镜头列表（提交时以当前分镜为准） |
+
+- 总消耗算力 = `count × 单条成本`，提交时前置校验并扣减算力，余额不足直接失败。
+- 异步合成（FFmpeg），需通过任务接口轮询进度。
+
+**响应示例：**
+
+```json
+{
+  "code": 200,
+  "msg": "操作成功",
+  "logId": 1024,
+  "logIds": [1024, 1025, 1026]
+}
+```
+
+### 14.5 生成任务查询（APP 轮询）
+
+| 方法 | URL | 说明 |
+|------|-----|------|
+| GET | `/batch/ai/video/task/list?groupId={groupId}` | 该组生成任务列表（按时间倒序，校验组归属） |
+| GET | `/batch/ai/video/task/{logId}` | 单条生成任务详情（仅本人或 admin 可查） |
+
+**BatchAiVideoGenerateLog 字段：** `logId`, `phone`, `groupId`, `videoGroupName`, `generateCount`(每条记录固定为 1), `consumeValue`, `status`(0 处理中 / 1 成功 / 2 失败), `progress`(0-100), `resultUrl`（产出视频 URL）, `errorMsg`, `clipSeed`（去重随机种子）, `createTime`
+
+### 14.6 生成记录列表（管理后台）
+
+```http
+GET /batch/ai/video/log/list
+```
+
+- 权限：`batch:aivideo:list`；TableDataInfo 分页，支持按 `BatchAiVideoGenerateLog` 字段（如 `phone`、`groupId`、`status`）筛选。
+
+---
+
+## 15. 注册二维码接口
+
+### 15.1 扫码统计入口（匿名）
+
+```http
+GET /batch/qrcode/scan?phone={phone}
+```
+
+- `@Anonymous` 注解放行，无需登录。
+- 注册二维码内容即指向本接口：扫码后对应账号的扫码次数 +1（`batch_qr_code_stat`），然后 **302 重定向** 到 APP 下载地址（配置项 `batch.app.download-url`）。
+
+### 15.2 后台二维码管理
+
+见第 3 节客户接口表：`PUT /batch/customer/qrCode/{customerId}`（生成/重置）、`GET /batch/customer/qrCode/download/{customerId}`（下载并计数）、`GET /batch/customer/qrCode/stat/{customerId}`（累计统计）。
+
+---
+
+## 16. APP 端对接现状与剩余缺口
+
+### 16.1 已落地的接口（原缺口清单回顾）
+
+| 需求 | 状态 | 说明 |
+|------|------|------|
+| APP 手机号+密码登录 | ✅ 已实现 | `POST /batch/app/login`（第 13 节），不再依赖 `sys_user` |
+| APP 扫码注册 | ✅ 已实现 | `POST /batch/app/register`，支持 `parentPhone` 上级绑定 |
+| APP 修改密码 | ✅ 已实现 | `POST /batch/app/changePassword`；后台重置用 `PUT /batch/customer/resetPassword` |
+| 算力检查/扣减 | ✅ 已实现 | `POST /batch/computing/log/consume` 前置扣减；AI 生成接口内部亦直接校验扣减；余额查询见 `/batch/computing/log/my` |
+| 视频解析/去水印 | ✅ 已实现 | `/batch/watermark/parse`（POST 解析、GET list/{id} 查询、DELETE 删除），服务端调用 `scripts/video_parse.py`（Python + Playwright）解析抖音/小红书 |
+| AI 视频分割/生成 | ✅ 已实现 | `/batch/ai/video/split`、`/generate`、`/task/list`、`/task/{logId}`（第 14 节），FFmpeg 异步合成 |
+| 二维码推广统计 | ✅ 已实现 | `GET /batch/qrcode/scan` 匿名计数 + `/batch/customer/qrCode/*` 后台管理 |
+| 头像上传 | ✅ 已实现 | `POST /batch/app/upload` + `PUT /batch/app/customer`（`avatarUrl` 字段） |
+
+### 16.2 目前真正剩余的缺口
+
+| 需求 | 当前后端状态 | 建议 |
+|------|--------------|------|
+| 忘记密码/短信验证码找回 | 无接口（也无短信通道） | 需新增验证码下发与校验接口，或暂由后台 `PUT /batch/customer/resetPassword` 人工重置 |
+| 抖音/微信等第三方账号绑定 | 无接口，`batch_customer` 无对应字段 | 需新增绑定关系表与绑定/解绑接口（高危操作需二次确认） |
+| APP 版本更新检查 | 后台已有 `/batch/config/version/*` 管理接口 | APP 端尚无匿名/免鉴权的「检查更新」查询接口，可按需补充 |
+
+---
+
+## 17. 附录：HttpStatus 状态码对照
 
 | 状态码 | 含义 |
 |--------|------|

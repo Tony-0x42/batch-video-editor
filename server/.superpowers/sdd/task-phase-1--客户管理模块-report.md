@@ -95,7 +95,7 @@
 
 1. **并行修改冲突**：工作区中存在其他 Phase 的并行改动，本提交仅包含 Phase 1（客户管理）相关文件。
 2. **编译环境受限**：本地 JDK 1.8 无法编译 Java 17 项目，建议在具备 Java 17 环境后执行 `mvn clean package -DskipTests` 验证。
-3. **二维码下载页 URL**：当前使用配置项 `batch.app.downloadUrl`（默认 `https://batchvideo.example.com/download`），后续可由 Phase 8 系统配置模块统一管理。
+3. **二维码下载页 URL**：当前使用配置项 `batch.app.downloadUrl`（默认 `https://batch-video-editor.example.com/download`），后续可由 Phase 8 系统配置模块统一管理。
 4. **算力/视频记录 Tab**：详情页中算力消耗记录、视频生成记录 Tab 当前为空状态占位，待 Phase 7 数据统计/算力模块完成后接入真实数据。
 5. **分公司管理员数据权限**：当前以 `SecurityUtils.getLoginUser().getUser().getPhonenumber()` 作为分公司手机号过滤。若后台管理员手机号与分公司手机号不一致，需在后续迭代中补充管理员-分公司绑定字段。
 
@@ -103,4 +103,4 @@
 
 - **SHA**: `5bfcd49983ce04061dd95c59d3397d235f1cd784`
 - **Message**: `feat(Phase 1: 客户管理模块): 实现客户列表/新增/编辑/删除/详情/二维码/升级/迁移后端与前端`
-- **Push**: 已推送至 `https://github.com/Tony-0x42/batch-video-server.git` main 分支
+- **Push**: 已推送至 `https://github.com/Tony-0x42/batch-video-editor.git` main 分支
